@@ -1,5 +1,5 @@
 import { getDb } from '$lib/server/db.js';
-import type { PageServerLoad } from './$types.js';
+import type { PageServerLoad } from './$types';
 
 export const load: PageServerLoad = () => {
   const db = getDb();
@@ -17,8 +17,5 @@ export const load: PageServerLoad = () => {
     ORDER BY s.created_at DESC LIMIT 5
   `).all();
 
-  const settingsRows = db.prepare('SELECT * FROM settings').all() as { key: string, value: string }[];
-  const settings = settingsRows.reduce((acc, row) => ({ ...acc, [row.key]: row.value }), {});
-
-  return { productCount, clientCount, posCount, todaySales, todayRevenue, totalRevenue, recentSales, settings };
+  return { productCount, clientCount, posCount, todaySales, todayRevenue, totalRevenue, recentSales };
 };

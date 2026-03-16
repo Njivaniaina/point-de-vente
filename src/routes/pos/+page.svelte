@@ -222,8 +222,8 @@
 </style>
 
 <svelte:head>
-  <title>Caisse — ShopPOS</title>
-  <meta name="description" content="Interface point de vente ShopPOS" />
+  <title>Caisse — {data.settings.shop_name || 'ShopPOS'}</title>
+  <meta name="description" content="Interface point de vente {data.settings.shop_name || 'ShopPOS'}" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 </svelte:head>
 
@@ -238,7 +238,7 @@
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-1.5 6h13" />
           </svg>
         </div>
-        <span class="text-white font-bold text-sm hidden sm:block">ShopPOS</span>
+        <span class="text-white font-bold text-sm hidden sm:block">{data.settings.shop_name || 'ShopPOS'}</span>
       </div>
 
       <!-- Caisse selector -->
@@ -509,68 +509,68 @@
       </div>
 
       <!-- Thermal Ticket Body -->
-      <div id="thermal-ticket" class="bg-white p-6 font-mono text-[13px] text-gray-900 leading-tight print:p-0">
-        <div class="text-center space-y-1 mb-6">
-          <h2 class="font-black text-xl uppercase italic">{data.settings.shop_name}</h2>
-          <p class="text-xs">{data.settings.shop_address}</p>
-          <p class="text-xs">Tél: {data.settings.shop_phone}</p>
-          <div class="border-b border-dashed border-gray-400 my-2 pt-2"></div>
-          <p class="font-bold">FACTURÉ LE {new Date(invoiceData.sale.created_at).toLocaleDateString('fr-FR')}</p>
-          <p class="text-[11px]">{new Date(invoiceData.sale.created_at).toLocaleTimeString('fr-FR')}</p>
+      <div id="thermal-ticket" style="background-color: #ffffff; color: #000000; padding: 24px; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace; font-size: 13px; line-height: 1.25;" class="print:p-0">
+        <div style="text-align: center; margin-bottom: 24px;">
+          <h2 style="font-weight: 900; font-size: 20px; text-transform: uppercase; font-style: italic; margin: 0;">{data.settings.shop_name}</h2>
+          <p style="font-size: 12px; margin: 4px 0 0 0;">{data.settings.shop_address}</p>
+          <p style="font-size: 12px; margin: 4px 0 0 0;">Tél: {data.settings.shop_phone}</p>
+          <div style="border-bottom: 1px dashed #9ca3af; margin: 8px 0; padding-top: 8px;"></div>
+          <p style="font-weight: bold; margin: 0;">FACTURÉ LE {new Date(invoiceData.sale.created_at).toLocaleDateString('fr-FR')}</p>
+          <p style="font-size: 11px; margin: 0;">{new Date(invoiceData.sale.created_at).toLocaleTimeString('fr-FR')}</p>
         </div>
 
-        <div class="space-y-1 mb-4">
-          <div class="flex justify-between"><span>REF:</span><span class="font-bold">{invoiceData.sale.invoice_ref}</span></div>
-          <div class="flex justify-between"><span>CAISSE:</span><span>{invoiceData.sale.pos_name}</span></div>
-          <div class="flex justify-between"><span>CLIENT:</span><span>{invoiceData.sale.client_name ?? 'Anonyme'}</span></div>
-          <div class="flex justify-between uppercase">
+        <div style="margin-bottom: 16px;">
+          <div style="display: flex; justify-content: space-between;"><span>REF:</span><span style="font-weight: bold;">{invoiceData.sale.invoice_ref}</span></div>
+          <div style="display: flex; justify-content: space-between;"><span>CAISSE:</span><span>{invoiceData.sale.pos_name}</span></div>
+          <div style="display: flex; justify-content: space-between;"><span>CLIENT:</span><span>{invoiceData.sale.client_name ?? 'Anonyme'}</span></div>
+          <div style="display: flex; justify-content: space-between; text-transform: uppercase;">
             <span>PAIEMENT:</span>
-            <span>
+            <span style="text-align: right;">
               {paymentLabels[invoiceData.sale.payment_method]}
               {#if invoiceData.sale.card_number}
-                <br/><span class="text-[10px] text-gray-500 italic">#{invoiceData.sale.card_number}</span>
+                <br/><span style="font-size: 10px; color: #6b7280; font-style: italic;">#{invoiceData.sale.card_number}</span>
               {/if}
             </span>
           </div>
         </div>
 
-        <div class="border-b border-dashed border-gray-400 my-3"></div>
+        <div style="border-bottom: 1px dashed #9ca3af; margin: 12px 0;"></div>
 
-        <table class="w-full text-[12px] mb-4">
+        <table style="width: 100%; font-size: 12px; margin-bottom: 16px; border-collapse: collapse;">
           <thead>
-            <tr class="text-left"><th class="pb-1">ART</th><th class="pb-1 text-center font-normal">QTÉ</th><th class="pb-1 text-right font-normal">P.U</th><th class="pb-1 text-right">TOTAL</th></tr>
+            <tr style="text-align: left;"><th style="padding-bottom: 4px;">ART</th><th style="padding-bottom: 4px; text-align: center; font-weight: normal;">QTÉ</th><th style="padding-bottom: 4px; text-align: right; font-weight: normal;">P.U</th><th style="padding-bottom: 4px; text-align: right;">TOTAL</th></tr>
           </thead>
-          <tbody class="divide-y divide-dashed divide-gray-200">
+          <tbody style="border-top: 1px dashed #e5e7eb;">
             {#each invoiceData.items as item}
-              <tr>
-                <td class="py-1 uppercase font-bold text-[11px] truncate max-w-[100px]">{item.product_name}</td>
-                <td class="py-1 text-center">{item.quantity}</td>
-                <td class="py-1 text-right text-[11px]">{formatPrice(item.unit_price)}</td>
-                <td class="py-1 text-right font-bold">{formatPrice(item.subtotal)}</td>
+              <tr style="border-bottom: 1px dashed #e5e7eb;">
+                <td style="padding: 4px 0; text-transform: uppercase; font-weight: bold; font-size: 11px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 100px;">{item.product_name}</td>
+                <td style="padding: 4px 0; text-align: center;">{item.quantity}</td>
+                <td style="padding: 4px 0; text-align: right; font-size: 11px;">{formatPrice(item.unit_price)}</td>
+                <td style="padding: 4px 0; text-align: right; font-weight: bold;">{formatPrice(item.subtotal)}</td>
               </tr>
             {/each}
           </tbody>
         </table>
 
-        <div class="border-t border-dashed border-gray-400 pt-3 space-y-1 mb-4 text-[12px]">
-          <div class="flex justify-between">
+        <div style="border-top: 1px dashed #9ca3af; padding-top: 12px; margin-bottom: 16px; font-size: 12px;">
+          <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
             <span>SOUS-TOTAL</span>
             <span>{formatPrice(invoiceData.sale.subtotal)}</span>
           </div>
-          <div class="flex justify-between">
+          <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
             <span>TAXE ({invoiceData.sale.tax_rate}%)</span>
             <span>{formatPrice(invoiceData.sale.tax_amount)}</span>
           </div>
         </div>
 
-        <div class="border-t-2 border-double border-gray-900 pt-3 flex justify-between items-center mb-6">
-          <span class="font-black text-sm">TOTAL</span>
-          <span class="text-lg font-black">{formatPrice(invoiceData.sale.total_amount)}</span>
+        <div style="border-top: 2px double #000000; padding-top: 12px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+          <span style="font-weight: 900; font-size: 14px;">TOTAL</span>
+          <span style="font-size: 18px; font-weight: 900;">{formatPrice(invoiceData.sale.total_amount)}</span>
         </div>
 
-        <div class="text-center font-bold italic space-y-1">
-          <p>MERCI DE VOTRE VISITE !</p>
-          <p class="text-[10px] uppercase font-normal text-gray-500">A conserver - Ticket client</p>
+        <div style="text-align: center; font-weight: bold; font-style: italic;">
+          <p style="margin: 0;">MERCI DE VOTRE VISITE !</p>
+          <p style="font-size: 10px; text-transform: uppercase; font-weight: normal; color: #6b7280; margin: 4px 0 0 0;">A conserver - Ticket client</p>
         </div>
       </div>
 

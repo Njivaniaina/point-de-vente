@@ -37,7 +37,9 @@
   }
 </script>
 
-<svelte:head><title>Caisses — ShopPOS</title></svelte:head>
+<svelte:head>
+  <title>Caisses — {data.settings.shop_name || 'ShopPOS'}</title>
+</svelte:head>
 
 <div class="space-y-6">
   <div class="flex items-center justify-between">

@@ -44,7 +44,7 @@
   }
 </script>
 
-<svelte:head><title>Catégories — ShopPOS</title></svelte:head>
+<svelte:head><title>Catégories — {data.settings.shop_name || 'ShopPOS'}</title></svelte:head>
 
 <div class="space-y-6">
   <div class="flex items-center justify-between">

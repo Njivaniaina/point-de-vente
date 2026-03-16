@@ -54,7 +54,9 @@
   }
 </script>
 
-<svelte:head><title>Produits — ShopPOS</title></svelte:head>
+<svelte:head>
+  <title>Produits — {data.settings.shop_name || 'ShopPOS'}</title>
+</svelte:head>
 
 <div class="space-y-6">
   <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">

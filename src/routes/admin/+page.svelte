@@ -31,7 +31,7 @@
 </script>
 
 <svelte:head>
-  <title>Administration — ShopPOS</title>
+  <title>Administration — {data.settings.shop_name || 'ShopPOS'}</title>
 </svelte:head>
 
 <div class="space-y-6">

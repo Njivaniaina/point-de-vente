@@ -2,7 +2,7 @@
   import { page } from '$app/stores';
   import { goto } from '$app/navigation';
 
-  let { children } = $props();
+  let { data, children } = $props();
 
   const navItems = [
     { href: '/admin', label: 'Tableau de bord', icon: 'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6' },
@@ -37,7 +37,7 @@
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-1.5 6h13M7 13L5.4 5M9 19a1 1 0 100 2 1 1 0 000-2zm10 0a1 1 0 100 2 1 1 0 000-2z" />
         </svg>
       </div>
-      <span class="text-white font-bold text-lg">ShopPOS</span>
+      <span class="text-white font-bold text-lg">{data.settings.shop_name || 'ShopPOS'}</span>
     </div>
 
     <!-- Nav -->
@@ -83,7 +83,7 @@
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
         </svg>
       </button>
-      <span class="font-bold text-gray-900">ShopPOS Admin</span>
+      <span class="font-bold text-gray-900">{data.settings.shop_name || 'ShopPOS'} Admin</span>
       <button onclick={() => goto('/pos')} class="bg-blue-600 text-white text-xs font-bold px-3 py-1.5 rounded-lg">Caisse</button>
     </header>
 
