@@ -60,12 +60,31 @@ function initSchema(db: Database.Database) {
       pos_id INTEGER NOT NULL REFERENCES pos_instances(id),
       client_id INTEGER REFERENCES clients(id) ON DELETE SET NULL,
       total_amount REAL NOT NULL DEFAULT 0,
-      payment_method TEXT NOT NULL DEFAULT 'cash',
-      invoice_ref TEXT NOT NULL,
+      payment_method TEXT NOT NULL,
+      invoice_ref TEXT UNIQUE NOT NULL,
+      card_number TEXT,
+      subtotal REAL NOT NULL DEFAULT 0,
+      tax_amount REAL NOT NULL DEFAULT 0,
+      tax_rate REAL NOT NULL DEFAULT 0,
+      currency TEXT NOT NULL DEFAULT 'MGA',
+      exchange_rate REAL NOT NULL DEFAULT 1,
       note TEXT,
-      created_at TEXT NOT NULL DEFAULT (datetime('now'))
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
     );
+  `);
 
+  // Migrations for sales table
+  const salesCols = db.prepare("PRAGMA table_info(sales)").all() as any[];
+  const salesColNames = salesCols.map(c => c.name);
+  if (!salesColNames.includes('subtotal')) db.exec("ALTER TABLE sales ADD COLUMN subtotal REAL NOT NULL DEFAULT 0");
+  if (!salesColNames.includes('tax_amount')) db.exec("ALTER TABLE sales ADD COLUMN tax_amount REAL NOT NULL DEFAULT 0");
+  if (!salesColNames.includes('tax_rate')) db.exec("ALTER TABLE sales ADD COLUMN tax_rate REAL NOT NULL DEFAULT 0");
+  if (!salesColNames.includes('currency')) db.exec("ALTER TABLE sales ADD COLUMN currency TEXT NOT NULL DEFAULT 'MGA'");
+  if (!salesColNames.includes('exchange_rate')) db.exec("ALTER TABLE sales ADD COLUMN exchange_rate REAL NOT NULL DEFAULT 1");
+  if (!salesColNames.includes('card_number')) db.exec("ALTER TABLE sales ADD COLUMN card_number TEXT");
+  if (!salesColNames.includes('note')) db.exec("ALTER TABLE sales ADD COLUMN note TEXT");
+
+  db.exec(`
     CREATE TABLE IF NOT EXISTS sale_items (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       sale_id INTEGER NOT NULL REFERENCES sales(id) ON DELETE CASCADE,
@@ -99,6 +118,6 @@ function initSchema(db: Database.Database) {
 
   const settingsCount = (db.prepare('SELECT COUNT(*) as count FROM settings').get() as { count: number }).count;
   if (settingsCount === 0) {
-    db.prepare("INSERT INTO settings (key, value) VALUES ('shop_name', 'SHOP POS'), ('shop_address', 'Antananarivo, Madagascar'), ('shop_phone', '+261 34 00 000 00')").run();
+    db.prepare("INSERT INTO settings (key, value) VALUES ('shop_name', 'SHOP POS'), ('shop_address', 'Antananarivo, Madagascar'), ('shop_phone', '+261 34 00 000 00'), ('currency', 'MGA'), ('usd_rate', '4000'), ('eur_rate', '4500'), ('tax_rate', '20')").run();
   }
 }

@@ -1,7 +1,7 @@
 <script lang="ts">
-  let { data } = $props();
+  let { data } = $props() as any;
   
-  let settings = $state({ ...data.settings });
+  let settings = $state(data.settings as any);
   let loading = $state(false);
   let success = $state(false);
 
@@ -59,6 +59,51 @@
           bind:value={settings.shop_phone} 
           type="text" 
           placeholder="Ex: +261 34 00 000 00"
+          class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+        />
+      </div>
+
+      <div>
+        <label for="currency" class="block text-sm font-medium text-gray-700 mb-1">Devise par défaut</label>
+        <select 
+          id="currency"
+          bind:value={settings.currency} 
+          class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm bg-white"
+        >
+          <option value="MGA">MGA (Ariary Malgache)</option>
+          <option value="USD">USD (Dollar US)</option>
+          <option value="EUR">EUR (Euro)</option>
+        </select>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+        <div>
+          <label for="usd_rate" class="block text-sm font-medium text-gray-700 mb-1">Taux USD (1 $ = ? Ar)</label>
+          <input 
+            id="usd_rate"
+            bind:value={settings.usd_rate} 
+            type="number" 
+            class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+          />
+        </div>
+        <div>
+          <label for="eur_rate" class="block text-sm font-medium text-gray-700 mb-1">Taux EUR (1 € = ? Ar)</label>
+          <input 
+            id="eur_rate"
+            bind:value={settings.eur_rate} 
+            type="number" 
+            class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+          />
+        </div>
+      </div>
+
+      <div class="pt-2">
+        <label for="tax_rate" class="block text-sm font-medium text-gray-700 mb-1">Taux de Taxe (TVA %)</label>
+        <input 
+          id="tax_rate"
+          bind:value={settings.tax_rate} 
+          type="number" 
+          placeholder="Ex: 20"
           class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
         />
       </div>

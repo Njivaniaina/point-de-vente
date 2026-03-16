@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { PageData } from './$types.js';
 
-  let { data }: { data: PageData } = $props();
+  let { data } = $props() as any;
   let sales = $state(data.sales as any[]);
   let search = $state('');
   let selectedSale = $state<any>(null);
@@ -14,9 +14,6 @@
     s.pos_name.toLowerCase().includes(search.toLowerCase())
   ));
 
-  function formatMGA(n: number) {
-    return new Intl.NumberFormat('fr-MG').format(n) + ' Ar';
-  }
 
   async function viewSale(id: number) {
     const res = await fetch(`/api/sales/${id}`);
@@ -25,21 +22,21 @@
     saleItems = data.items;
   }
 
-  function downloadInvoice(data: { sale: any, items: any[] }) {
+  function downloadInvoice(data: { sale: any, items: any[], settings: any }) {
     const sale = data.sale;
     const items = data.items;
-    let text = `SHOP POS - FACTURE ${sale.invoice_ref}\n`;
+    let text = `${data.settings.shop_name} - FACTURE ${sale.invoice_ref}\n`;
     text += `==========================================\n`;
     text += `Date: ${new Date(sale.created_at).toLocaleString('fr-FR')}\n`;
     text += `Caisse: ${sale.pos_name}\n`;
     text += `Client: ${sale.client_name ?? 'Anonyme'}\n`;
-    text += `Paiement: ${paymentLabels[sale.payment_method]}\n`;
+    text += `Paiement: ${paymentLabels[sale.payment_method]}${sale.card_number ? ' (' + sale.card_number + ')' : ''}\n`;
     text += `------------------------------------------\n`;
     items.forEach((item: any) => {
-      text += `${item.product_name.padEnd(25)} x${item.quantity}  ${new Intl.NumberFormat('fr-MG').format(item.subtotal)} Ar\n`;
+      text += `${item.product_name.padEnd(25)} x${item.quantity}  ${formatPrice(item.subtotal)}\n`;
     });
     text += `------------------------------------------\n`;
-    text += `TOTAL: ${new Intl.NumberFormat('fr-MG').format(sale.total_amount)} Ar\n`;
+    text += `TOTAL: ${formatPrice(sale.total_amount)}\n`;
     text += `==========================================\n`;
     text += `Merci de votre visite !\n`;
 
@@ -82,13 +79,42 @@
     }
   }
 
-  const paymentLabels: Record<string, string> = { cash: 'Espèces', card: 'Carte', mobile: 'Virement Bancaire' };
+  const paymentLabels: Record<string, string> = { cash: 'Espèces', card: 'Carte' };
+
+  let currencyFormat = $derived(new Intl.NumberFormat('fr-FR', {
+    style: 'currency',
+    currency: data.settings.currency || 'MGA',
+    currencyDisplay: 'symbol'
+  }));
+
+  function formatPrice(amount: number, saleContext?: any) {
+    const currency = saleContext ? (saleContext.currency || 'MGA') : (data.settings.currency || 'MGA');
+    
+    // For historical invoices, we use the stored rate if available
+    const rate = saleContext 
+      ? parseFloat(saleContext.exchange_rate || '1') 
+      : parseFloat(data.settings[currency.toLowerCase() + '_rate'] || '1');
+
+    if (currency === 'MGA') {
+      return new Intl.NumberFormat('fr-MG').format(amount) + ' Ar';
+    }
+    
+    const converted = amount / (rate || 1);
+    
+    // Create a local formatter for the specific currency if it's historical
+    const formatter = saleContext ? new Intl.NumberFormat('fr-FR', {
+      style: 'currency',
+      currency: currency,
+      currencyDisplay: 'symbol'
+    }) : currencyFormat;
+
+    return formatter.format(converted);
+  }
 </script>
 
 <style>
   @media print {
     :global(body) { background: white !important; }
-    .print-hidden { display: none !important; }
     #thermal-ticket { 
       width: 80mm !important; 
       margin: 0 !important; 
@@ -140,7 +166,7 @@
               <td class="px-4 py-3 hidden lg:table-cell">
                 <span class="text-xs px-2 py-0.5 bg-gray-100 rounded-full">{paymentLabels[sale.payment_method] ?? sale.payment_method}</span>
               </td>
-              <td class="px-4 py-3 text-right font-bold text-gray-900 whitespace-nowrap">{formatMGA(sale.total_amount)}</td>
+              <td class="px-4 py-3 text-right font-bold text-gray-900 whitespace-nowrap">{formatPrice(sale.total_amount, sale)}</td>
               <td class="px-4 py-3 text-right text-gray-500 text-xs whitespace-nowrap">{new Date(sale.created_at).toLocaleString('fr-FR', { day: '2-digit', month: '2-digit', year: '2-digit', hour: '2-digit', minute: '2-digit' })}</td>
               <td class="px-4 py-3 text-right">
                 <button onclick={() => viewSale(sale.id)} class="text-blue-600 hover:text-blue-800 text-xs font-semibold underline">Voir</button>
@@ -202,7 +228,15 @@
           <div class="flex justify-between"><span>REF:</span><span class="font-bold">{selectedSale.invoice_ref}</span></div>
           <div class="flex justify-between"><span>CAISSE:</span><span>{selectedSale.pos_name}</span></div>
           <div class="flex justify-between"><span>CLIENT:</span><span>{selectedSale.client_name ?? 'Anonyme'}</span></div>
-          <div class="flex justify-between"><span>PAIEMENT:</span><span>{paymentLabels[selectedSale.payment_method]}</span></div>
+          <div class="flex justify-between uppercase">
+            <span>PAIEMENT:</span>
+            <span>
+              {paymentLabels[selectedSale.payment_method]}
+              {#if selectedSale.card_number}
+                <br/><span class="text-[10px] text-gray-500 italic">#{selectedSale.card_number}</span>
+              {/if}
+            </span>
+          </div>
         </div>
 
         <div class="border-b border-dashed border-gray-400 my-3"></div>
@@ -216,16 +250,27 @@
               <tr>
                 <td class="py-1 uppercase font-bold text-[11px] truncate max-w-[100px]">{item.product_name}</td>
                 <td class="py-1 text-center">{item.quantity}</td>
-                <td class="py-1 text-right text-[11px]">{new Intl.NumberFormat('fr-MG').format(item.unit_price)}</td>
-                <td class="py-1 text-right font-bold">{new Intl.NumberFormat('fr-MG').format(item.subtotal)}</td>
+                <td class="py-1 text-right text-[11px]">{formatPrice(item.unit_price, selectedSale)}</td>
+                <td class="py-1 text-right font-bold">{formatPrice(item.subtotal, selectedSale)}</td>
               </tr>
             {/each}
           </tbody>
         </table>
 
+        <div class="border-t border-dashed border-gray-400 pt-3 space-y-1 mb-4 text-[12px]">
+          <div class="flex justify-between uppercase">
+            <span>SOUS-TOTAL</span>
+            <span>{formatPrice(selectedSale.subtotal, selectedSale)}</span>
+          </div>
+          <div class="flex justify-between uppercase">
+            <span>TAXE ({selectedSale.tax_rate}%)</span>
+            <span>{formatPrice(selectedSale.tax_amount, selectedSale)}</span>
+          </div>
+        </div>
+
         <div class="border-t-2 border-double border-gray-900 pt-3 flex justify-between items-center mb-6">
-          <span class="font-black text-sm">TOTAL (Ar)</span>
-          <span class="text-lg font-black">{new Intl.NumberFormat('fr-MG').format(selectedSale.total_amount)}</span>
+          <span class="font-black text-sm uppercase">TOTAL HP</span>
+          <span class="text-lg font-black">{formatPrice(selectedSale.total_amount, selectedSale)}</span>
         </div>
 
         <div class="text-center font-bold italic space-y-1">

@@ -16,5 +16,9 @@ export const load: PageServerLoad = () => {
     LEFT JOIN clients c ON s.client_id = c.id
     ORDER BY s.created_at DESC LIMIT 5
   `).all();
-  return { productCount, clientCount, posCount, todaySales, todayRevenue, totalRevenue, recentSales };
+
+  const settingsRows = db.prepare('SELECT * FROM settings').all() as { key: string, value: string }[];
+  const settings = settingsRows.reduce((acc, row) => ({ ...acc, [row.key]: row.value }), {});
+
+  return { productCount, clientCount, posCount, todaySales, todayRevenue, totalRevenue, recentSales, settings };
 };

@@ -1,15 +1,32 @@
 <script lang="ts">
   let { data } = $props();
 
-  function formatMGA(n: number) {
-    return new Intl.NumberFormat('fr-MG').format(n) + ' Ar';
+  function formatPrice(amount: number, saleContext?: any) {
+    const currency = saleContext ? (saleContext.currency || 'MGA') : (data.settings.currency || 'MGA');
+    
+    // For historical sales, we use the stored rate if available
+    const rate = saleContext 
+      ? parseFloat(saleContext.exchange_rate || '1') 
+      : parseFloat(data.settings[currency.toLowerCase() + '_rate'] || '1');
+
+    if (currency === 'MGA') {
+      return new Intl.NumberFormat('fr-MG').format(amount) + ' Ar';
+    }
+    
+    const converted = amount / (rate || 1);
+    
+    return new Intl.NumberFormat('fr-FR', {
+      style: 'currency',
+      currency: currency,
+      currencyDisplay: 'symbol'
+    }).format(converted);
   }
 
   const stats = [
     { label: 'Produits actifs', value: data.productCount, color: 'bg-blue-600', icon: 'M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4' },
     { label: 'Clients', value: data.clientCount, color: 'bg-emerald-600', icon: 'M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z' },
     { label: 'Ventes aujourd\'hui', value: data.todaySales, color: 'bg-violet-600', icon: 'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2' },
-    { label: 'CA aujourd\'hui', value: formatMGA(data.todayRevenue), color: 'bg-amber-600', icon: 'M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z' },
+    { label: 'CA aujourd\'hui', value: formatPrice(data.todayRevenue), color: 'bg-amber-600', icon: 'M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z' },
   ];
 </script>
 
@@ -55,7 +72,7 @@
               <p class="text-gray-400 text-xs">{sale.pos_name} · {sale.client_name ?? 'Client anonyme'}</p>
             </div>
             <div class="text-right">
-              <p class="font-bold text-gray-900 text-sm">{formatMGA(sale.total_amount)}</p>
+              <p class="font-bold text-gray-900 text-sm">{formatPrice(sale.total_amount, sale)}</p>
               <p class="text-gray-400 text-xs">{new Date(sale.created_at).toLocaleDateString('fr-FR')}</p>
             </div>
           </div>
@@ -73,11 +90,11 @@
       <div class="p-6 space-y-4">
         <div class="flex items-center justify-between p-4 bg-blue-50 rounded-xl">
           <span class="text-blue-700 font-medium text-sm">Chiffre d'affaires total</span>
-          <span class="text-blue-900 font-black text-lg">{formatMGA(data.totalRevenue)}</span>
+          <span class="text-blue-900 font-black text-lg">{formatPrice(data.totalRevenue)}</span>
         </div>
         <div class="flex items-center justify-between p-4 bg-amber-50 rounded-xl">
           <span class="text-amber-700 font-medium text-sm">Aujourd'hui</span>
-          <span class="text-amber-900 font-black text-lg">{formatMGA(data.todayRevenue)}</span>
+          <span class="text-amber-900 font-black text-lg">{formatPrice(data.todayRevenue)}</span>
         </div>
         <div class="pt-2">
           <a href="/pos" class="flex items-center justify-center gap-2 w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl transition-colors">

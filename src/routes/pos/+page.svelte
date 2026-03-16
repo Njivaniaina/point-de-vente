@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { PageData } from './$types.js';
 
-  let { data }: { data: PageData } = $props();
+  let { data } = $props() as any;
 
   type Product = { id: number; name: string; price: number; stock: number; category_id: number | null; category_name?: string; category_color?: string; image_url?: string };
   type CartItem = { product: Product; quantity: number };
@@ -14,17 +14,36 @@
   let selectedCategoryId = $state<number | null>(null);
   let search = $state('');
   let cart = $state<CartItem[]>([]);
-  let selectedPosId = $state<number>(posInstances[0]?.id ?? 0);
-  let selectedClientId = $state<number | string>('');
-  let showCheckout = $state(false);
+  let selectedPosId = $state<number | null>(data.posInstances[0]?.id ?? null);
+  let selectedClientId = $state<number | null>(null);
   let paymentMethod = $state('cash');
+  let cardNumber = $state('');
   let note = $state('');
   let loading = $state(false);
+  let showCheckout = $state(false);
   let invoiceData = $state<any>(null);
   let sidebarOpen = $state(false);
   let loadingPDF = $state(false);
 
-  const paymentLabels: Record<string, string> = { cash: 'Espèces', card: 'Carte', mobile: 'Virement Bancaire' };
+  const paymentLabels: Record<string, string> = { cash: 'Espèces', card: 'Carte' };
+
+  let currencyFormat = $derived(new Intl.NumberFormat('fr-FR', {
+    style: 'currency',
+    currency: data.settings.currency || 'MGA',
+    currencyDisplay: 'symbol'
+  }));
+
+  function formatPrice(amount: number) {
+    const currency = data.settings.currency || 'MGA';
+    if (currency === 'MGA') {
+      return new Intl.NumberFormat('fr-MG').format(amount) + ' Ar';
+    }
+    
+    const rate = parseFloat(data.settings[currency.toLowerCase() + '_rate'] || '1');
+    const converted = amount / (rate || 1);
+    
+    return currencyFormat.format(converted);
+  }
 
   let filtered = $derived(products.filter(p => {
     const matchesCategory = selectedCategoryId === null || p.category_id === selectedCategoryId;
@@ -32,7 +51,10 @@
     return matchesCategory && matchesSearch;
   }));
 
-  let cartTotal = $derived(cart.reduce((sum, item) => sum + item.product.price * item.quantity, 0));
+  let taxRate = $derived(parseFloat(data.settings.tax_rate || '0'));
+  let cartSubtotal = $derived(cart.reduce((sum, item) => sum + item.product.price * item.quantity, 0));
+  let cartTaxAmount = $derived(cartSubtotal * (taxRate / 100));
+  let cartTotal = $derived(cartSubtotal + cartTaxAmount);
   let cartCount = $derived(cart.reduce((sum, item) => sum + item.quantity, 0));
 
   function addToCart(product: Product) {
@@ -60,9 +82,6 @@
 
   function clearCart() { cart = []; }
 
-  function formatMGA(n: number) {
-    return new Intl.NumberFormat('fr-MG').format(n) + ' Ar';
-  }
 
   async function checkout() {
     if (!selectedPosId) return;
@@ -74,33 +93,55 @@
       unit_price: i.product.price
     }));
 
-    const res = await fetch('/api/sales', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        pos_id: selectedPosId,
-        client_id: selectedClientId || null,
-        items,
-        payment_method: paymentMethod,
-        note
-      })
-    });
-    const data = await res.json();
-    
-    // Update stock locally
-    data.items.forEach((soldItem: any) => {
-      const product = products.find(p => p.id === soldItem.product_id);
-      if (product) product.stock -= soldItem.quantity;
-    });
-    products = [...products];
-    cart = [];
-    showCheckout = false;
-    loading = false;
-    
-    // Add a tiny delay before showing the invoice to prevent click-through
-    setTimeout(() => {
-      invoiceData = data;
-    }, 100);
+    try {
+      const res = await fetch('/api/sales', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          pos_id: selectedPosId,
+          client_id: selectedClientId,
+          payment_method: paymentMethod,
+          card_number: paymentMethod === 'card' ? cardNumber : null,
+          subtotal: cartSubtotal,
+          tax_amount: cartTaxAmount,
+          tax_rate: taxRate,
+          currency: data.settings.currency || 'MGA',
+          exchange_rate: parseFloat(data.settings[(data.settings.currency || 'MGA').toLowerCase() + '_rate'] || '1'),
+          note,
+          items
+        })
+      });
+
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.error || `Erreur serveur: ${res.status}`);
+      }
+
+      const result = await res.json();
+      
+      // Update stock locally
+      if (result.items) {
+        result.items.forEach((soldItem: any) => {
+          const product = products.find(p => p.id === soldItem.product_id);
+          if (product) product.stock -= soldItem.quantity;
+        });
+        products = [...products];
+      }
+
+      cart = [];
+      showCheckout = false;
+      
+      // Add a tiny delay before showing the invoice to prevent click-through
+      setTimeout(() => {
+        invoiceData = result;
+      }, 100);
+
+    } catch (err: any) {
+      console.error("Checkout error:", err);
+      alert(`Erreur lors de la validation: ${err.message}`);
+    } finally {
+      loading = false;
+    }
   }
 
   function printInvoice() { window.print(); }
@@ -143,13 +184,15 @@
     text += `Date: ${new Date(sale.created_at).toLocaleString('fr-FR')}\n`;
     text += `Caisse: ${sale.pos_name}\n`;
     text += `Client: ${sale.client_name ?? 'Anonyme'}\n`;
-    text += `Paiement: ${paymentLabels[sale.payment_method]}\n`;
+    text += `Paiement: ${paymentLabels[sale.payment_method]}${sale.card_number ? ' (' + sale.card_number + ')' : ''}\n`;
     text += `------------------------------------------\n`;
     items.forEach((item: any) => {
-      text += `${item.product_name.padEnd(25)} x${item.quantity}  ${new Intl.NumberFormat('fr-MG').format(item.subtotal)} Ar\n`;
+      text += `${item.product_name.padEnd(25)} x${item.quantity}  ${formatPrice(item.subtotal)}\n`;
     });
     text += `------------------------------------------\n`;
-    text += `TOTAL: ${new Intl.NumberFormat('fr-MG').format(sale.total_amount)} Ar\n`;
+    text += `SOUS-TOTAL: ${formatPrice(sale.subtotal)}\n`;
+    text += `TAXE (${sale.tax_rate}%): ${formatPrice(sale.tax_amount)}\n`;
+    text += `TOTAL: ${formatPrice(sale.total_amount)}\n`;
     text += `==========================================\n`;
     text += `Merci de votre visite !\n`;
 
@@ -166,7 +209,6 @@
 <style>
   @media print {
     :global(body) { background: white !important; }
-    .print-hidden { display: none !important; }
     #thermal-ticket { 
       width: 80mm !important; 
       margin: 0 !important; 
@@ -268,11 +310,13 @@
             {@const cartItem = cart.find(i => i.product.id === product.id)}
             <button
               onclick={() => addToCart(product)}
-              class="bg-gray-900 border-2 rounded-xl p-3 text-left transition-all duration-150 hover:shadow-lg hover:-translate-y-0.5 active:scale-95 cursor-pointer
-                {cartItem ? 'border-blue-500 shadow-blue-600/20 shadow-lg' : 'border-gray-800 hover:border-gray-600'}"
+              disabled={product.stock <= 0}
+              class="bg-gray-900 border-2 rounded-xl p-3 text-left transition-all duration-150 hover:shadow-lg hover:-translate-y-0.5 active:scale-95
+                {product.stock <= 0 ? 'opacity-50 grayscale cursor-not-allowed border-gray-800' : 'cursor-pointer'}
+                {cartItem && product.stock > 0 ? 'border-blue-500 shadow-blue-600/20 shadow-lg' : 'border-gray-800 hover:border-gray-600'}"
             >
               <!-- Product image / placeholder -->
-              <div class="w-full aspect-square rounded-lg mb-3 flex items-center justify-center overflow-hidden"
+              <div class="relative w-full aspect-square rounded-lg mb-3 flex items-center justify-center overflow-hidden"
                 style="background-color: {product.category_color ?? '#1f2937'}20">
                 {#if product.image_url}
                   <img src={product.image_url} alt={product.name} class="w-full h-full object-cover rounded-lg" />
@@ -281,11 +325,16 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
                   </svg>
                 {/if}
+                
+                <!-- Stock Badge -->
+                <div class="absolute bottom-1 right-1 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider
+                  {product.stock <= 0 ? 'bg-red-500 text-white' : 'bg-gray-800/80 text-gray-300'}">
+                  {product.stock <= 0 ? 'Épuisé' : `Stock: ${product.stock}`}
+                </div>
               </div>
               <p class="text-white text-xs font-semibold leading-tight line-clamp-2 mb-1">{product.name}</p>
-              <p class="text-blue-400 text-xs font-bold">{formatMGA(product.price)}</p>
-              <div class="mt-1.5 flex items-center justify-between">
-                <span class="text-gray-600 text-xs">Stock: {product.stock}</span>
+              <div class="flex justify-between items-center mt-3">
+                <span class="text-blue-600 font-bold">{formatPrice(product.price)}</span>
                 {#if cartItem}
                   <span class="bg-blue-600 text-white text-xs font-bold w-5 h-5 rounded-full flex items-center justify-center">{cartItem.quantity}</span>
                 {/if}
@@ -341,7 +390,7 @@
           <div class="px-4 py-3 border-b border-gray-800 flex items-start gap-3">
             <div class="flex-1 min-w-0">
               <p class="text-white text-sm font-medium leading-tight line-clamp-1">{item.product.name}</p>
-              <p class="text-blue-400 text-xs">{formatMGA(item.product.price)}</p>
+              <p class="text-blue-400 text-xs">{formatPrice(item.product.price)}</p>
             </div>
             <div class="flex items-center gap-1 shrink-0">
               <button onclick={() => updateQty(item.product.id, -1)} class="w-6 h-6 rounded-md bg-gray-700 hover:bg-gray-600 text-white text-sm flex items-center justify-center transition-colors">−</button>
@@ -360,7 +409,7 @@
     <div class="px-4 py-4 border-t border-gray-800 space-y-3 shrink-0">
       <div class="flex items-center justify-between text-white">
         <span class="text-gray-400">Total</span>
-        <span class="text-xl font-black text-white">{formatMGA(cartTotal)}</span>
+        <span class="text-xl font-black text-white">{formatPrice(cartTotal)}</span>
       </div>
       <button
         onclick={() => { showCheckout = true; sidebarOpen = false; }}
@@ -379,7 +428,7 @@
     <div class="bg-gray-900 border border-gray-700 rounded-2xl shadow-2xl w-full max-w-md">
       <div class="px-6 py-5 border-b border-gray-800">
         <h2 class="font-bold text-white text-lg">Finaliser la vente</h2>
-        <p class="text-gray-500 text-sm">{cartCount} article(s) — {formatMGA(cartTotal)}</p>
+        <p class="text-gray-500 text-sm">{cartCount} article(s) — {formatPrice(cartTotal)}</p>
       </div>
       <div class="p-6 space-y-4">
         <div>
@@ -419,7 +468,7 @@
       <div class="px-6 py-4 border-t border-gray-800 flex gap-3 justify-end">
         <button onclick={() => showCheckout = false} class="px-4 py-2 text-sm text-gray-400 hover:text-white transition-colors">Annuler</button>
         <button onclick={checkout} disabled={loading || !selectedPosId} class="bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white font-bold px-6 py-2 rounded-xl text-sm transition-colors">
-          {loading ? 'Traitement...' : `Valider — ${formatMGA(cartTotal)}`}
+          {loading ? 'Traitement...' : `Valider — ${formatPrice(cartTotal)}`}
         </button>
       </div>
     </div>
@@ -474,7 +523,15 @@
           <div class="flex justify-between"><span>REF:</span><span class="font-bold">{invoiceData.sale.invoice_ref}</span></div>
           <div class="flex justify-between"><span>CAISSE:</span><span>{invoiceData.sale.pos_name}</span></div>
           <div class="flex justify-between"><span>CLIENT:</span><span>{invoiceData.sale.client_name ?? 'Anonyme'}</span></div>
-          <div class="flex justify-between"><span>PAIEMENT:</span><span>{paymentLabels[invoiceData.sale.payment_method]}</span></div>
+          <div class="flex justify-between uppercase">
+            <span>PAIEMENT:</span>
+            <span>
+              {paymentLabels[invoiceData.sale.payment_method]}
+              {#if invoiceData.sale.card_number}
+                <br/><span class="text-[10px] text-gray-500 italic">#{invoiceData.sale.card_number}</span>
+              {/if}
+            </span>
+          </div>
         </div>
 
         <div class="border-b border-dashed border-gray-400 my-3"></div>
@@ -488,16 +545,27 @@
               <tr>
                 <td class="py-1 uppercase font-bold text-[11px] truncate max-w-[100px]">{item.product_name}</td>
                 <td class="py-1 text-center">{item.quantity}</td>
-                <td class="py-1 text-right text-[11px]">{new Intl.NumberFormat('fr-MG').format(item.unit_price)}</td>
-                <td class="py-1 text-right font-bold">{new Intl.NumberFormat('fr-MG').format(item.subtotal)}</td>
+                <td class="py-1 text-right text-[11px]">{formatPrice(item.unit_price)}</td>
+                <td class="py-1 text-right font-bold">{formatPrice(item.subtotal)}</td>
               </tr>
             {/each}
           </tbody>
         </table>
 
+        <div class="border-t border-dashed border-gray-400 pt-3 space-y-1 mb-4 text-[12px]">
+          <div class="flex justify-between">
+            <span>SOUS-TOTAL</span>
+            <span>{formatPrice(invoiceData.sale.subtotal)}</span>
+          </div>
+          <div class="flex justify-between">
+            <span>TAXE ({invoiceData.sale.tax_rate}%)</span>
+            <span>{formatPrice(invoiceData.sale.tax_amount)}</span>
+          </div>
+        </div>
+
         <div class="border-t-2 border-double border-gray-900 pt-3 flex justify-between items-center mb-6">
-          <span class="font-black text-sm">TOTAL (Ar)</span>
-          <span class="text-lg font-black">{new Intl.NumberFormat('fr-MG').format(invoiceData.sale.total_amount)}</span>
+          <span class="font-black text-sm">TOTAL</span>
+          <span class="text-lg font-black">{formatPrice(invoiceData.sale.total_amount)}</span>
         </div>
 
         <div class="text-center font-bold italic space-y-1">
