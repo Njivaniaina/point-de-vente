@@ -45,7 +45,7 @@ Un système de **point de vente moderne** inspiré du module POS d'Odoo, conçu 
 
 ```bash
 # 1. Cloner le repository
-git clone https://github.com/votre-username/point-de-vente.git
+git clone https://github.com/Njivaniaina/point-de-vente.git
 cd point-de-vente
 
 # 2. Installer les dépendances
