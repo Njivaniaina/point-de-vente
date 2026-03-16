@@ -74,6 +74,11 @@ function initSchema(db: Database.Database) {
       unit_price REAL NOT NULL DEFAULT 0,
       subtotal REAL NOT NULL DEFAULT 0
     );
+
+    CREATE TABLE IF NOT EXISTS settings (
+      key TEXT PRIMARY KEY,
+      value TEXT
+    );
   `);
 
 	// Seed default data if empty
@@ -91,4 +96,9 @@ function initSchema(db: Database.Database) {
         ('Stylo Bic', 500, 200, 4)
     `).run();
 	}
+
+  const settingsCount = (db.prepare('SELECT COUNT(*) as count FROM settings').get() as { count: number }).count;
+  if (settingsCount === 0) {
+    db.prepare("INSERT INTO settings (key, value) VALUES ('shop_name', 'SHOP POS'), ('shop_address', 'Antananarivo, Madagascar'), ('shop_phone', '+261 34 00 000 00')").run();
+  }
 }

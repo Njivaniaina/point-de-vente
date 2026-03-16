@@ -6,6 +6,7 @@
   let search = $state('');
   let selectedSale = $state<any>(null);
   let saleItems = $state<any[]>([]);
+  let loadingPDF = $state(false);
 
   let filtered = $derived(sales.filter((s: any) =>
     s.invoice_ref.toLowerCase().includes(search.toLowerCase()) ||
@@ -24,10 +25,86 @@
     saleItems = data.items;
   }
 
-  const paymentLabels: Record<string, string> = { cash: 'Espèces', card: 'Carte', mobile: 'Mobile Money' };
+  function downloadInvoice(data: { sale: any, items: any[] }) {
+    const sale = data.sale;
+    const items = data.items;
+    let text = `SHOP POS - FACTURE ${sale.invoice_ref}\n`;
+    text += `==========================================\n`;
+    text += `Date: ${new Date(sale.created_at).toLocaleString('fr-FR')}\n`;
+    text += `Caisse: ${sale.pos_name}\n`;
+    text += `Client: ${sale.client_name ?? 'Anonyme'}\n`;
+    text += `Paiement: ${paymentLabels[sale.payment_method]}\n`;
+    text += `------------------------------------------\n`;
+    items.forEach((item: any) => {
+      text += `${item.product_name.padEnd(25)} x${item.quantity}  ${new Intl.NumberFormat('fr-MG').format(item.subtotal)} Ar\n`;
+    });
+    text += `------------------------------------------\n`;
+    text += `TOTAL: ${new Intl.NumberFormat('fr-MG').format(sale.total_amount)} Ar\n`;
+    text += `==========================================\n`;
+    text += `Merci de votre visite !\n`;
+
+    const blob = new Blob([text], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `facture_${sale.invoice_ref}.txt`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  async function exportToPDF(invoiceRef: string) {
+    const element = document.getElementById('thermal-ticket');
+    if (!element) return;
+    
+    // @ts-ignore
+    const html2pdf = window.html2pdf;
+    if (!html2pdf) {
+      alert("Erreur: Le module PDF n'est pas chargé. Veuillez patienter ou actualiser la page.");
+      return;
+    }
+
+    loadingPDF = true;
+    const opt = {
+      margin:       5,
+      filename:     `ticket_${invoiceRef}.pdf`,
+      image:        { type: 'jpeg', quality: 0.98 },
+      html2canvas:  { scale: 2, useCORS: true, logging: false, letterRendering: true },
+      jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    };
+
+    try {
+      await html2pdf().from(element).set(opt).save();
+    } catch (err) {
+      console.error("PDF Error:", err);
+      alert("Erreur lors de la génération du PDF.");
+    } finally {
+      loadingPDF = false;
+    }
+  }
+
+  const paymentLabels: Record<string, string> = { cash: 'Espèces', card: 'Carte', mobile: 'Virement Bancaire' };
 </script>
 
-<svelte:head><title>Ventes — ShopPOS</title></svelte:head>
+<style>
+  @media print {
+    :global(body) { background: white !important; }
+    .print-hidden { display: none !important; }
+    #thermal-ticket { 
+      width: 80mm !important; 
+      margin: 0 !important; 
+      padding: 0 !important;
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+    :global(.fixed) { position: absolute !important; }
+  }
+</style>
+
+<svelte:head>
+  <title>Ventes — ShopPOS</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+</svelte:head>
 
 <div class="space-y-6">
   <div>
@@ -79,43 +156,93 @@
 </div>
 
 {#if selectedSale}
-  <div class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onclick={() => selectedSale = null}>
-    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden" onclick={(e) => e.stopPropagation()}>
-      <div class="bg-gray-950 px-6 py-5 text-white">
-        <div class="flex items-center justify-between">
-          <div>
-            <p class="text-xs text-gray-400">Facture</p>
-            <h2 class="font-bold font-mono">{selectedSale.invoice_ref}</h2>
-          </div>
-          <button onclick={() => window.print()} class="bg-blue-600 hover:bg-blue-700 text-xs font-bold px-3 py-1.5 rounded-lg transition-colors">🖨 Imprimer</button>
+  <div 
+    class="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4 overflow-y-auto" 
+  >
+    <div class="bg-white rounded-xl shadow-2xl w-full max-w-[300px] overflow-hidden" onclick={(e) => e.stopPropagation()}>
+      <!-- Modal Header (Controls) -->
+      <div class="bg-gray-100 px-4 py-3 flex items-center justify-between border-b print:hidden">
+        <span class="text-xs font-bold text-gray-500 uppercase tracking-wider">Aperçu du ticket</span>
+        <div class="flex gap-2">
+          <button 
+            type="button"
+            onclick={() => exportToPDF(selectedSale.invoice_ref)} 
+            disabled={loadingPDF}
+            class="bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white text-[10px] font-bold px-2 py-1 rounded transition-colors flex items-center gap-1"
+          >
+            {#if loadingPDF}
+              <span class="animate-spin text-[10px]">⌛</span>
+            {/if}
+            PDF
+          </button>
+          <button 
+            type="button"
+            onclick={() => window.print()} 
+            disabled={loadingPDF}
+            class="bg-gray-800 hover:bg-gray-950 disabled:opacity-50 text-white text-[10px] font-bold px-2 py-1 rounded transition-colors flex items-center gap-1"
+          >
+            <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" /></svg>
+            PRINT
+          </button>
         </div>
       </div>
-      <div class="p-6 space-y-4 print:text-black" id="invoice-print">
-        <div class="grid grid-cols-2 gap-3 text-sm">
-          <div><p class="text-gray-400 text-xs">Caisse</p><p class="font-medium">{selectedSale.pos_name}</p></div>
-          <div><p class="text-gray-400 text-xs">Client</p><p class="font-medium">{selectedSale.client_name ?? 'Anonyme'}</p></div>
-          <div><p class="text-gray-400 text-xs">Mode de paiement</p><p class="font-medium">{paymentLabels[selectedSale.payment_method] ?? selectedSale.payment_method}</p></div>
-          <div><p class="text-gray-400 text-xs">Date</p><p class="font-medium text-xs">{new Date(selectedSale.created_at).toLocaleString('fr-FR')}</p></div>
+
+      <!-- Thermal Ticket Body -->
+      <div id="thermal-ticket" class="bg-white p-6 font-mono text-[13px] text-gray-900 leading-tight print:p-0">
+        <div class="text-center space-y-1 mb-6">
+          <h2 class="font-black text-xl uppercase italic">{data.settings.shop_name}</h2>
+          <p class="text-xs">{data.settings.shop_address}</p>
+          <p class="text-xs">Tél: {data.settings.shop_phone}</p>
+          <div class="border-b border-dashed border-gray-400 my-2 pt-2"></div>
+          <p class="font-bold">FACTURÉ LE {new Date(selectedSale.created_at).toLocaleDateString('fr-FR')}</p>
+          <p class="text-[11px]">{new Date(selectedSale.created_at).toLocaleTimeString('fr-FR')}</p>
         </div>
-        <div class="border-t pt-4">
-          <table class="w-full text-sm">
-            <thead><tr class="text-gray-400 text-xs"><th class="text-left pb-2">Article</th><th class="text-right pb-2">Qté</th><th class="text-right pb-2">P.U.</th><th class="text-right pb-2">Total</th></tr></thead>
-            <tbody class="divide-y divide-gray-50">
-              {#each saleItems as item}
-                <tr>
-                  <td class="py-2">{item.product_name}</td>
-                  <td class="py-2 text-right">{item.quantity}</td>
-                  <td class="py-2 text-right whitespace-nowrap">{new Intl.NumberFormat('fr-MG').format(item.unit_price)} Ar</td>
-                  <td class="py-2 text-right font-semibold whitespace-nowrap">{new Intl.NumberFormat('fr-MG').format(item.subtotal)} Ar</td>
-                </tr>
-              {/each}
-            </tbody>
-          </table>
+
+        <div class="space-y-1 mb-4">
+          <div class="flex justify-between"><span>REF:</span><span class="font-bold">{selectedSale.invoice_ref}</span></div>
+          <div class="flex justify-between"><span>CAISSE:</span><span>{selectedSale.pos_name}</span></div>
+          <div class="flex justify-between"><span>CLIENT:</span><span>{selectedSale.client_name ?? 'Anonyme'}</span></div>
+          <div class="flex justify-between"><span>PAIEMENT:</span><span>{paymentLabels[selectedSale.payment_method]}</span></div>
         </div>
-        <div class="border-t pt-3 flex justify-between items-center">
-          <span class="text-gray-600 font-semibold">Total</span>
-          <span class="text-xl font-black text-gray-900">{new Intl.NumberFormat('fr-MG').format(selectedSale.total_amount)} Ar</span>
+
+        <div class="border-b border-dashed border-gray-400 my-3"></div>
+
+        <table class="w-full text-[12px] mb-4">
+          <thead>
+            <tr class="text-left"><th class="pb-1">ART</th><th class="pb-1 text-center font-normal">QTÉ</th><th class="pb-1 text-right font-normal">P.U</th><th class="pb-1 text-right">TOTAL</th></tr>
+          </thead>
+          <tbody class="divide-y divide-dashed divide-gray-200">
+            {#each saleItems as item}
+              <tr>
+                <td class="py-1 uppercase font-bold text-[11px] truncate max-w-[100px]">{item.product_name}</td>
+                <td class="py-1 text-center">{item.quantity}</td>
+                <td class="py-1 text-right text-[11px]">{new Intl.NumberFormat('fr-MG').format(item.unit_price)}</td>
+                <td class="py-1 text-right font-bold">{new Intl.NumberFormat('fr-MG').format(item.subtotal)}</td>
+              </tr>
+            {/each}
+          </tbody>
+        </table>
+
+        <div class="border-t-2 border-double border-gray-900 pt-3 flex justify-between items-center mb-6">
+          <span class="font-black text-sm">TOTAL (Ar)</span>
+          <span class="text-lg font-black">{new Intl.NumberFormat('fr-MG').format(selectedSale.total_amount)}</span>
         </div>
+
+        <div class="text-center font-bold italic space-y-1">
+          <p>MERCI DE VOTRE VISITE !</p>
+          <p class="text-[10px] uppercase font-normal text-gray-500">A conserver - Ticket client</p>
+        </div>
+      </div>
+
+      <div class="p-4 border-t bg-gray-50 flex justify-end print:hidden">
+        <button 
+          type="button"
+          onclick={() => selectedSale = null} 
+          disabled={loadingPDF}
+          class="bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white font-bold px-8 py-2 rounded-lg text-xs transition-colors shadow-lg"
+        >
+          FERMER
+        </button>
       </div>
     </div>
   </div>

@@ -11,5 +11,8 @@ export const load: PageServerLoad = () => {
     ORDER BY s.created_at DESC
     LIMIT 200
   `).all();
-  return { sales };
+  const settingsRows = db.prepare('SELECT * FROM settings').all() as { key: string, value: string }[];
+  const settings = settingsRows.reduce((acc, row) => ({ ...acc, [row.key]: row.value }), {});
+
+  return { sales, settings };
 };

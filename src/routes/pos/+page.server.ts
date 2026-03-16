@@ -13,5 +13,9 @@ export const load: PageServerLoad = () => {
   const categories = db.prepare('SELECT * FROM categories ORDER BY name').all();
   const clients = db.prepare('SELECT * FROM clients ORDER BY name').all();
   const posInstances = db.prepare('SELECT * FROM pos_instances WHERE active = 1 ORDER BY name').all();
-  return { products, categories, clients, posInstances };
+  
+  const settingsRows = db.prepare('SELECT * FROM settings').all() as { key: string, value: string }[];
+  const settings = settingsRows.reduce((acc, row) => ({ ...acc, [row.key]: row.value }), {});
+
+  return { products, categories, clients, posInstances, settings };
 };
