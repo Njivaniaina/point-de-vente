@@ -26,6 +26,16 @@
   let sidebarOpen = $state(false);
   let loadingPDF = $state(false);
 
+  // Watch for client selection to auto-fill card number
+  $effect(() => {
+    if (selectedClientId) {
+      const client = clients.find(c => c.id === selectedClientId);
+      if (client && client.card_number && !cardNumber) {
+        cardNumber = client.card_number;
+      }
+    }
+  });
+
   const paymentLabels: Record<string, string> = { cash: 'Espèces', card: 'Carte' };
 
   let currencyFormat = $derived(new Intl.NumberFormat('fr-FR', {
@@ -102,7 +112,7 @@
           pos_id: selectedPosId,
           client_id: selectedClientId,
           payment_method: paymentMethod,
-          card_number: paymentMethod === 'card' ? cardNumber : null,
+          card_number: paymentMethod === 'card' ? (cardNumber || clients.find(c => c.id === selectedClientId)?.card_number) : null,
           subtotal: cartSubtotal,
           tax_amount: cartTaxAmount,
           tax_rate: taxRate,

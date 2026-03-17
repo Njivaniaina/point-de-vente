@@ -54,6 +54,7 @@ function initSchema(db: Database.Database) {
       phone TEXT,
       email TEXT,
       address TEXT,
+      card_number TEXT,
       created_at TEXT NOT NULL DEFAULT (datetime('now'))
     );
 
@@ -85,6 +86,11 @@ function initSchema(db: Database.Database) {
   if (!salesColNames.includes('exchange_rate')) db.exec("ALTER TABLE sales ADD COLUMN exchange_rate REAL NOT NULL DEFAULT 1");
   if (!salesColNames.includes('card_number')) db.exec("ALTER TABLE sales ADD COLUMN card_number TEXT");
   if (!salesColNames.includes('note')) db.exec("ALTER TABLE sales ADD COLUMN note TEXT");
+
+  // Migrations for clients table
+  const clientsCols = db.prepare("PRAGMA table_info(clients)").all() as any[];
+  const clientsColNames = clientsCols.map(c => c.name);
+  if (!clientsColNames.includes('card_number')) db.exec("ALTER TABLE clients ADD COLUMN card_number TEXT");
 
   db.exec(`
     CREATE TABLE IF NOT EXISTS sale_items (

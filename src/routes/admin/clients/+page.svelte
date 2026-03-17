@@ -13,7 +13,7 @@
     (c.email ?? '').toLowerCase().includes(search.toLowerCase())
   ));
 
-  function openNew() { editTarget = { name: '', phone: '', email: '', address: '' }; showModal = true; error = ''; }
+  function openNew() { editTarget = { name: '', phone: '', email: '', address: '', card_number: '' }; showModal = true; error = ''; }
   function openEdit(c: any) { editTarget = { ...c }; showModal = true; error = ''; }
 
   async function save() {
@@ -75,6 +75,9 @@
               <td class="px-4 py-3">
                 <div class="font-medium text-gray-900 dark:text-white">{client.name}</div>
                 <div class="text-gray-400 dark:text-gray-500 text-xs md:hidden">{client.phone ?? ''} {client.email ?? ''}</div>
+                {#if client.card_number}
+                  <div class="text-[10px] text-blue-500 font-mono mt-0.5">💳 {client.card_number}</div>
+                {/if}
               </td>
               <td class="px-4 py-3 text-gray-600 dark:text-gray-400 hidden sm:table-cell">{client.phone ?? '—'}</td>
               <td class="px-4 py-3 text-gray-600 dark:text-gray-400 hidden md:table-cell">{client.email ?? '—'}</td>
@@ -119,6 +122,10 @@
         <div>
           <label for="client-address" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Adresse</label>
           <textarea id="client-address" bind:value={editTarget.address} rows="2" class="w-full bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-300 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none transition-colors"></textarea>
+        </div>
+        <div>
+          <label for="client-card" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Numéro de carte bancaire</label>
+          <input id="client-card" bind:value={editTarget.card_number} placeholder="XXXX XXXX XXXX XXXX" class="w-full bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-300 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors" />
         </div>
       </div>
       <div class="px-6 py-4 border-t dark:border-gray-800 flex gap-3 justify-end">
