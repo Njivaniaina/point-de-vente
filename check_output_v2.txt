@@ -1,0 +1,802 @@
+
+> point-de-vente@0.0.1 check
+> svelte-kit sync && svelte-check --tsconfig ./tsconfig.json
+
+Loading svelte-check in workspace: /home/njiva/git/point-de-vente
+Getting Svelte diagnostics...
+
+/home/njiva/git/point-de-vente/src/routes/admin/+page.svelte:26:40
+Warn: This reference only captures the initial value of `data`. Did you mean to reference it inside a closure instead?
+https://svelte.dev/e/state_referenced_locally (svelte)
+  const stats = [
+    { label: 'Produits actifs', value: data.productCount, color: 'bg-blue-600', icon: 'M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4' },
+    { label: 'Clients', value: data.clientCount, color: 'bg-emerald-600', icon: 'M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z' },
+
+/home/njiva/git/point-de-vente/src/routes/admin/+page.svelte:27:32
+Warn: This reference only captures the initial value of `data`. Did you mean to reference it inside a closure instead?
+https://svelte.dev/e/state_referenced_locally (svelte)
+    { label: 'Produits actifs', value: data.productCount, color: 'bg-blue-600', icon: 'M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4' },
+    { label: 'Clients', value: data.clientCount, color: 'bg-emerald-600', icon: 'M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z' },
+    { label: 'Ventes aujourd\'hui', value: data.todaySales, color: 'bg-violet-600', icon: 'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2' },
+
+/home/njiva/git/point-de-vente/src/routes/admin/+page.svelte:28:44
+Warn: This reference only captures the initial value of `data`. Did you mean to reference it inside a closure instead?
+https://svelte.dev/e/state_referenced_locally (svelte)
+    { label: 'Clients', value: data.clientCount, color: 'bg-emerald-600', icon: 'M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z' },
+    { label: 'Ventes aujourd\'hui', value: data.todaySales, color: 'bg-violet-600', icon: 'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2' },
+    { label: 'CA aujourd\'hui', value: formatPrice(data.todayRevenue), color: 'bg-amber-600', icon: 'M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z' },
+
+/home/njiva/git/point-de-vente/src/routes/admin/+page.svelte:29:52
+Warn: This reference only captures the initial value of `data`. Did you mean to reference it inside a closure instead?
+https://svelte.dev/e/state_referenced_locally (svelte)
+    { label: 'Ventes aujourd\'hui', value: data.todaySales, color: 'bg-violet-600', icon: 'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2' },
+    { label: 'CA aujourd\'hui', value: formatPrice(data.todayRevenue), color: 'bg-amber-600', icon: 'M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z' },
+  ];
+
+/home/njiva/git/point-de-vente/src/routes/admin/categories/+page.svelte:3:27
+Warn: This reference only captures the initial value of `data`. Did you mean to reference it inside a derived instead?
+https://svelte.dev/e/state_referenced_locally (svelte)
+  let { data } = $props() as any;
+  let categories = $state(data.categories);
+  let showModal = $state(false);
+
+/home/njiva/git/point-de-vente/src/routes/admin/categories/+page.svelte:70:11
+Warn: Buttons and links should either contain text or have an `aria-label`, `aria-labelledby` or `title` attribute
+https://svelte.dev/e/a11y_consider_explicit_label (svelte)
+        <div class="flex gap-1">
+          <button onclick={() => openEdit(cat)} class="p-1.5 rounded-lg text-gray-400 dark:text-gray-500 hover:bg-blue-50 dark:hover:bg-blue-900/30 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
+          </button>
+          <button onclick={() => deleteCategory(cat.id)} class="p-1.5 rounded-lg text-gray-400 dark:text-gray-500 hover:bg-red-50 dark:hover:bg-red-900/30 hover:text-red-600 dark:hover:text-red-400 transition-colors">
+
+/home/njiva/git/point-de-vente/src/routes/admin/categories/+page.svelte:73:11
+Warn: Buttons and links should either contain text or have an `aria-label`, `aria-labelledby` or `title` attribute
+https://svelte.dev/e/a11y_consider_explicit_label (svelte)
+          </button>
+          <button onclick={() => deleteCategory(cat.id)} class="p-1.5 rounded-lg text-gray-400 dark:text-gray-500 hover:bg-red-50 dark:hover:bg-red-900/30 hover:text-red-600 dark:hover:text-red-400 transition-colors">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+          </button>
+        </div>
+
+/home/njiva/git/point-de-vente/src/routes/admin/categories/+page.svelte:93:11
+Warn: A form label must be associated with a control
+https://svelte.dev/e/a11y_label_has_associated_control (svelte)
+        <div>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Nom *</label>
+          <input bind:value={editTarget!.name} class="w-full bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-300 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors" placeholder="Ex: Électronique" />
+
+/home/njiva/git/point-de-vente/src/routes/admin/categories/+page.svelte:97:11
+Warn: A form label must be associated with a control
+https://svelte.dev/e/a11y_label_has_associated_control (svelte)
+        <div>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Couleur</label>
+          <div class="flex items-center gap-3">
+
+/home/njiva/git/point-de-vente/src/routes/admin/categories/+page.svelte:30:35
+Error: Parameter 'c' implicitly has an 'any' type. (ts)
+    if (isEdit) {
+      categories = categories.map(c => c.id === data.id ? data : c);
+    } else {
+
+/home/njiva/git/point-de-vente/src/routes/admin/categories/+page.svelte:41:36
+Error: Parameter 'c' implicitly has an 'any' type. (ts)
+    await fetch(`/api/categories/${id}`, { method: 'DELETE' });
+    categories = categories.filter(c => c.id !== id);
+  }
+
+/home/njiva/git/point-de-vente/src/routes/admin/clients/+page.svelte:3:24
+Warn: This reference only captures the initial value of `data`. Did you mean to reference it inside a derived instead?
+https://svelte.dev/e/state_referenced_locally (svelte)
+  let { data } = $props() as any;
+  let clients = $state(data.clients as any[]);
+  let showModal = $state(false);
+
+/home/njiva/git/point-de-vente/src/routes/admin/clients/+page.svelte:83:19
+Warn: Buttons and links should either contain text or have an `aria-label`, `aria-labelledby` or `title` attribute
+https://svelte.dev/e/a11y_consider_explicit_label (svelte)
+                <div class="flex gap-1 justify-end">
+                  <button onclick={() => openEdit(client)} class="p-1.5 rounded-lg text-gray-400 dark:text-gray-500 hover:bg-blue-50 dark:hover:bg-blue-900/30 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
+                  </button>
+                  <button onclick={() => deleteClient(client.id)} class="p-1.5 rounded-lg text-gray-400 dark:text-gray-500 hover:bg-red-50 dark:hover:bg-red-900/30 hover:text-red-600 dark:hover:text-red-400 transition-colors">
+
+/home/njiva/git/point-de-vente/src/routes/admin/clients/+page.svelte:86:19
+Warn: Buttons and links should either contain text or have an `aria-label`, `aria-labelledby` or `title` attribute
+https://svelte.dev/e/a11y_consider_explicit_label (svelte)
+                  </button>
+                  <button onclick={() => deleteClient(client.id)} class="p-1.5 rounded-lg text-gray-400 dark:text-gray-500 hover:bg-red-50 dark:hover:bg-red-900/30 hover:text-red-600 dark:hover:text-red-400 transition-colors">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                  </button>
+                </div>
+
+/home/njiva/git/point-de-vente/src/routes/admin/clients/+page.svelte:108:11
+Warn: A form label must be associated with a control
+https://svelte.dev/e/a11y_label_has_associated_control (svelte)
+        <div>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Nom *</label>
+          <input bind:value={editTarget.name} class="w-full bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-300 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors" />
+
+/home/njiva/git/point-de-vente/src/routes/admin/clients/+page.svelte:112:11
+Warn: A form label must be associated with a control
+https://svelte.dev/e/a11y_label_has_associated_control (svelte)
+        <div>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Téléphone</label>
+          <input bind:value={editTarget.phone} class="w-full bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-300 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors" />
+
+/home/njiva/git/point-de-vente/src/routes/admin/clients/+page.svelte:116:11
+Warn: A form label must be associated with a control
+https://svelte.dev/e/a11y_label_has_associated_control (svelte)
+        <div>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email</label>
+          <input type="email" bind:value={editTarget.email} class="w-full bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-300 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors" />
+
+/home/njiva/git/point-de-vente/src/routes/admin/clients/+page.svelte:120:11
+Warn: A form label must be associated with a control
+https://svelte.dev/e/a11y_label_has_associated_control (svelte)
+        <div>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Adresse</label>
+          <textarea bind:value={editTarget.address} rows="2" class="w-full bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-300 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none transition-colors"></textarea>
+
+/home/njiva/git/point-de-vente/src/routes/admin/pos/+page.svelte:3:29
+Warn: This reference only captures the initial value of `data`. Did you mean to reference it inside a derived instead?
+https://svelte.dev/e/state_referenced_locally (svelte)
+  let { data } = $props() as any;
+  let posInstances = $state(data.posInstances as any[]);
+  let showModal = $state(false);
+
+/home/njiva/git/point-de-vente/src/routes/admin/pos/+page.svelte:72:11
+Warn: Buttons and links should either contain text or have an `aria-label`, `aria-labelledby` or `title` attribute
+https://svelte.dev/e/a11y_consider_explicit_label (svelte)
+          </button>
+          <button onclick={() => openEdit(pos)} class="p-2 rounded-lg text-gray-400 dark:text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
+          </button>
+          <button onclick={() => toggleActive(pos)} class="p-2 rounded-lg text-gray-400 dark:text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors" title="{pos.active ? 'Désactiver' : 'Activer'}">
+
+/home/njiva/git/point-de-vente/src/routes/admin/pos/+page.svelte:93:11
+Warn: A form label must be associated with a control
+https://svelte.dev/e/a11y_label_has_associated_control (svelte)
+        <div>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Nom *</label>
+          <input bind:value={editTarget.name} class="w-full bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-300 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors" placeholder="Ex: Caisse 1" />
+
+/home/njiva/git/point-de-vente/src/routes/admin/pos/+page.svelte:97:11
+Warn: A form label must be associated with a control
+https://svelte.dev/e/a11y_label_has_associated_control (svelte)
+        <div>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Emplacement</label>
+          <input bind:value={editTarget.location} class="w-full bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-300 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors" placeholder="Ex: Rez-de-chaussée" />
+
+/home/njiva/git/point-de-vente/src/routes/admin/pos/+page.svelte:69:34
+Error: Cannot find name 'goto'. (ts)
+        <div class="mt-4 flex gap-2">
+          <button onclick={() => goto('/pos')} class="flex-1 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold py-2 rounded-lg transition-colors">
+            Ouvrir
+
+/home/njiva/git/point-de-vente/src/routes/admin/products/+page.svelte:3:25
+Warn: This reference only captures the initial value of `data`. Did you mean to reference it inside a derived instead?
+https://svelte.dev/e/state_referenced_locally (svelte)
+  let { data } = $props() as any;
+  let products = $state(data.products as any[]);
+  let categories = $state(data.categories as any[]);
+
+/home/njiva/git/point-de-vente/src/routes/admin/products/+page.svelte:4:27
+Warn: This reference only captures the initial value of `data`. Did you mean to reference it inside a derived instead?
+https://svelte.dev/e/state_referenced_locally (svelte)
+  let products = $state(data.products as any[]);
+  let categories = $state(data.categories as any[]);
+  let showModal = $state(false);
+
+/home/njiva/git/point-de-vente/src/routes/admin/products/+page.svelte:116:19
+Warn: Buttons and links should either contain text or have an `aria-label`, `aria-labelledby` or `title` attribute
+https://svelte.dev/e/a11y_consider_explicit_label (svelte)
+                <div class="flex gap-1 justify-end">
+                  <button onclick={() => openEdit(prod)} class="p-1.5 rounded-lg text-gray-400 dark:text-gray-500 hover:bg-blue-50 dark:hover:bg-blue-900/30 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
+                  </button>
+                  <button onclick={() => deleteProduct(prod.id)} class="p-1.5 rounded-lg text-gray-400 dark:text-gray-500 hover:bg-red-50 dark:hover:bg-red-900/30 hover:text-red-600 dark:hover:text-red-400 transition-colors">
+
+/home/njiva/git/point-de-vente/src/routes/admin/products/+page.svelte:119:19
+Warn: Buttons and links should either contain text or have an `aria-label`, `aria-labelledby` or `title` attribute
+https://svelte.dev/e/a11y_consider_explicit_label (svelte)
+                  </button>
+                  <button onclick={() => deleteProduct(prod.id)} class="p-1.5 rounded-lg text-gray-400 dark:text-gray-500 hover:bg-red-50 dark:hover:bg-red-900/30 hover:text-red-600 dark:hover:text-red-400 transition-colors">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                  </button>
+                </div>
+
+/home/njiva/git/point-de-vente/src/routes/admin/products/+page.svelte:144:13
+Warn: A form label must be associated with a control
+https://svelte.dev/e/a11y_label_has_associated_control (svelte)
+          <div class="sm:col-span-2">
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Nom *</label>
+            <input bind:value={editTarget.name} class="w-full bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-300 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors" placeholder="Ex: Téléphone Itel" />
+
+/home/njiva/git/point-de-vente/src/routes/admin/products/+page.svelte:148:13
+Warn: A form label must be associated with a control
+https://svelte.dev/e/a11y_label_has_associated_control (svelte)
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Prix (Ar)</label>
+            <input type="number" bind:value={editTarget.price} min="0" class="w-full bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-300 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors" />
+
+/home/njiva/git/point-de-vente/src/routes/admin/products/+page.svelte:152:13
+Warn: A form label must be associated with a control
+https://svelte.dev/e/a11y_label_has_associated_control (svelte)
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Stock</label>
+            <input type="number" bind:value={editTarget.stock} min="0" class="w-full bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-300 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors" />
+
+/home/njiva/git/point-de-vente/src/routes/admin/products/+page.svelte:156:13
+Warn: A form label must be associated with a control
+https://svelte.dev/e/a11y_label_has_associated_control (svelte)
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Catégorie</label>
+            <select bind:value={editTarget.category_id} class="w-full bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-300 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors">
+
+/home/njiva/git/point-de-vente/src/routes/admin/products/+page.svelte:165:13
+Warn: A form label must be associated with a control
+https://svelte.dev/e/a11y_label_has_associated_control (svelte)
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Code-barres</label>
+            <input bind:value={editTarget.barcode} class="w-full bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-300 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors" placeholder="EAN-13..." />
+
+/home/njiva/git/point-de-vente/src/routes/admin/products/+page.svelte:169:13
+Warn: A form label must be associated with a control
+https://svelte.dev/e/a11y_label_has_associated_control (svelte)
+          <div class="sm:col-span-2">
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">URL Image</label>
+            <input bind:value={editTarget.image_url} class="w-full bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-300 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors" placeholder="https://..." />
+
+/home/njiva/git/point-de-vente/src/routes/admin/sales/+page.svelte:5:22
+Warn: This reference only captures the initial value of `data`. Did you mean to reference it inside a derived instead?
+https://svelte.dev/e/state_referenced_locally (svelte)
+  let { data } = $props() as any;
+  let sales = $state(data.sales as any[]);
+  let search = $state('');
+
+/home/njiva/git/point-de-vente/src/routes/admin/sales/+page.svelte:188:5
+Warn: Visible, non-interactive elements with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type="button">` or `<a>` might be more appropriate
+https://svelte.dev/e/a11y_click_events_have_key_events (svelte)
+  >
+    <div class="bg-white dark:bg-gray-900 border dark:border-gray-800 rounded-xl shadow-2xl w-full max-w-[300px] overflow-hidden transition-colors duration-300" onclick={(e) => e.stopPropagation()}>
+      <!-- Modal Header (Controls) -->
+      <div class="bg-gray-100 dark:bg-gray-800 px-4 py-3 flex items-center justify-between border-b dark:border-gray-700 print:hidden transition-colors">
+        <span class="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Aperçu du ticket</span>
+        <div class="flex gap-2">
+          <button 
+            type="button"
+            onclick={() => exportToPDF(selectedSale.invoice_ref)} 
+            disabled={loadingPDF}
+            class="bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white text-[10px] font-bold px-2 py-1 rounded transition-colors flex items-center gap-1"
+          >
+            {#if loadingPDF}
+              <span class="animate-spin text-[10px]">⌛</span>
+            {/if}
+            PDF
+          </button>
+          <button 
+            type="button"
+            onclick={() => window.print()} 
+            disabled={loadingPDF}
+            class="bg-gray-800 hover:bg-gray-950 disabled:opacity-50 text-white text-[10px] font-bold px-2 py-1 rounded transition-colors flex items-center gap-1"
+          >
+            <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" /></svg>
+            PRINT
+          </button>
+        </div>
+      </div>
+
+      <!-- Thermal Ticket Body -->
+      <div id="thermal-ticket" style="background-color: #ffffff; color: #000000; padding: 24px; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace; font-size: 13px; line-height: 1.25;" class="print:p-0">
+        <div style="text-align: center; margin-bottom: 24px;">
+          <h2 style="font-weight: 900; font-size: 20px; text-transform: uppercase; font-style: italic; margin: 0;">{data.settings.shop_name}</h2>
+          <p style="font-size: 12px; margin: 4px 0 0 0;">{data.settings.shop_address}</p>
+          <p style="font-size: 12px; margin: 4px 0 0 0;">Tél: {data.settings.shop_phone}</p>
+          <div style="border-bottom: 1px dashed #9ca3af; margin: 8px 0; padding-top: 8px;"></div>
+          <p style="font-weight: bold; margin: 0;">FACTURÉ LE {new Date(selectedSale.created_at).toLocaleDateString('fr-FR')}</p>
+          <p style="font-size: 11px; margin: 0;">{new Date(selectedSale.created_at).toLocaleTimeString('fr-FR')}</p>
+        </div>
+
+        <div style="margin-bottom: 16px;">
+          <div style="display: flex; justify-content: space-between;"><span>REF:</span><span style="font-weight: bold;">{selectedSale.invoice_ref}</span></div>
+          <div style="display: flex; justify-content: space-between;"><span>CAISSE:</span><span>{selectedSale.pos_name}</span></div>
+          <div style="display: flex; justify-content: space-between;"><span>CLIENT:</span><span>{selectedSale.client_name ?? 'Anonyme'}</span></div>
+          <div style="display: flex; justify-content: space-between; text-transform: uppercase;">
+            <span>PAIEMENT:</span>
+            <span style="text-align: right;">
+              {paymentLabels[selectedSale.payment_method]}
+              {#if selectedSale.card_number}
+                <br/><span style="font-size: 10px; color: #6b7280; font-style: italic;">#{selectedSale.card_number}</span>
+              {/if}
+            </span>
+          </div>
+        </div>
+
+        <div style="border-bottom: 1px dashed #9ca3af; margin: 12px 0;"></div>
+
+        <table style="width: 100%; font-size: 12px; margin-bottom: 16px; border-collapse: collapse;">
+          <thead>
+            <tr style="text-align: left;"><th style="padding-bottom: 4px;">ART</th><th style="padding-bottom: 4px; text-align: center; font-weight: normal;">QTÉ</th><th style="padding-bottom: 4px; text-align: right; font-weight: normal;">P.U</th><th style="padding-bottom: 4px; text-align: right;">TOTAL</th></tr>
+          </thead>
+          <tbody style="border-top: 1px dashed #e5e7eb;">
+            {#each saleItems as item}
+              <tr style="border-bottom: 1px dashed #e5e7eb;">
+                <td style="padding: 4px 0; text-transform: uppercase; font-weight: bold; font-size: 11px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 100px;">{item.product_name}</td>
+                <td style="padding: 4px 0; text-align: center;">{item.quantity}</td>
+                <td style="padding: 4px 0; text-align: right; font-size: 11px;">{formatPrice(item.unit_price, selectedSale)}</td>
+                <td style="padding: 4px 0; text-align: right; font-weight: bold;">{formatPrice(item.subtotal, selectedSale)}</td>
+              </tr>
+            {/each}
+          </tbody>
+        </table>
+
+        <div style="border-top: 1px dashed #9ca3af; padding-top: 12px; margin-bottom: 16px; font-size: 12px;">
+          <div style="display: flex; justify-content: space-between; margin-bottom: 4px; text-transform: uppercase;">
+            <span>SOUS-TOTAL</span>
+            <span>{formatPrice(selectedSale.subtotal, selectedSale)}</span>
+          </div>
+          <div style="display: flex; justify-content: space-between; margin-bottom: 4px; text-transform: uppercase;">
+            <span>TAXE ({selectedSale.tax_rate}%)</span>
+            <span>{formatPrice(selectedSale.tax_amount, selectedSale)}</span>
+          </div>
+        </div>
+
+        <div style="border-top: 2px double #000000; padding-top: 12px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+          <span style="font-weight: 900; font-size: 14px; text-transform: uppercase;">TOTAL HP</span>
+          <span style="font-size: 18px; font-weight: 900;">{formatPrice(selectedSale.total_amount, selectedSale)}</span>
+        </div>
+
+        <div style="text-align: center; font-weight: bold; font-style: italic;">
+          <p style="margin: 0;">MERCI DE VOTRE VISITE !</p>
+          <p style="font-size: 10px; text-transform: uppercase; font-weight: normal; color: #6b7280; margin: 4px 0 0 0;">A conserver - Ticket client</p>
+        </div>
+      </div>
+
+      <div class="p-4 border-t border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-900/50 flex justify-end print:hidden transition-colors duration-300">
+        <button 
+          type="button"
+          onclick={() => selectedSale = null} 
+          disabled={loadingPDF}
+          class="bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white font-bold px-8 py-2 rounded-lg text-xs transition-colors shadow-lg"
+        >
+          FERMER
+        </button>
+      </div>
+    </div>
+  </div>
+
+/home/njiva/git/point-de-vente/src/routes/admin/sales/+page.svelte:188:5
+Warn: `<div>` with a click handler must have an ARIA role
+https://svelte.dev/e/a11y_no_static_element_interactions (svelte)
+  >
+    <div class="bg-white dark:bg-gray-900 border dark:border-gray-800 rounded-xl shadow-2xl w-full max-w-[300px] overflow-hidden transition-colors duration-300" onclick={(e) => e.stopPropagation()}>
+      <!-- Modal Header (Controls) -->
+      <div class="bg-gray-100 dark:bg-gray-800 px-4 py-3 flex items-center justify-between border-b dark:border-gray-700 print:hidden transition-colors">
+        <span class="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Aperçu du ticket</span>
+        <div class="flex gap-2">
+          <button 
+            type="button"
+            onclick={() => exportToPDF(selectedSale.invoice_ref)} 
+            disabled={loadingPDF}
+            class="bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white text-[10px] font-bold px-2 py-1 rounded transition-colors flex items-center gap-1"
+          >
+            {#if loadingPDF}
+              <span class="animate-spin text-[10px]">⌛</span>
+            {/if}
+            PDF
+          </button>
+          <button 
+            type="button"
+            onclick={() => window.print()} 
+            disabled={loadingPDF}
+            class="bg-gray-800 hover:bg-gray-950 disabled:opacity-50 text-white text-[10px] font-bold px-2 py-1 rounded transition-colors flex items-center gap-1"
+          >
+            <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" /></svg>
+            PRINT
+          </button>
+        </div>
+      </div>
+
+      <!-- Thermal Ticket Body -->
+      <div id="thermal-ticket" style="background-color: #ffffff; color: #000000; padding: 24px; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace; font-size: 13px; line-height: 1.25;" class="print:p-0">
+        <div style="text-align: center; margin-bottom: 24px;">
+          <h2 style="font-weight: 900; font-size: 20px; text-transform: uppercase; font-style: italic; margin: 0;">{data.settings.shop_name}</h2>
+          <p style="font-size: 12px; margin: 4px 0 0 0;">{data.settings.shop_address}</p>
+          <p style="font-size: 12px; margin: 4px 0 0 0;">Tél: {data.settings.shop_phone}</p>
+          <div style="border-bottom: 1px dashed #9ca3af; margin: 8px 0; padding-top: 8px;"></div>
+          <p style="font-weight: bold; margin: 0;">FACTURÉ LE {new Date(selectedSale.created_at).toLocaleDateString('fr-FR')}</p>
+          <p style="font-size: 11px; margin: 0;">{new Date(selectedSale.created_at).toLocaleTimeString('fr-FR')}</p>
+        </div>
+
+        <div style="margin-bottom: 16px;">
+          <div style="display: flex; justify-content: space-between;"><span>REF:</span><span style="font-weight: bold;">{selectedSale.invoice_ref}</span></div>
+          <div style="display: flex; justify-content: space-between;"><span>CAISSE:</span><span>{selectedSale.pos_name}</span></div>
+          <div style="display: flex; justify-content: space-between;"><span>CLIENT:</span><span>{selectedSale.client_name ?? 'Anonyme'}</span></div>
+          <div style="display: flex; justify-content: space-between; text-transform: uppercase;">
+            <span>PAIEMENT:</span>
+            <span style="text-align: right;">
+              {paymentLabels[selectedSale.payment_method]}
+              {#if selectedSale.card_number}
+                <br/><span style="font-size: 10px; color: #6b7280; font-style: italic;">#{selectedSale.card_number}</span>
+              {/if}
+            </span>
+          </div>
+        </div>
+
+        <div style="border-bottom: 1px dashed #9ca3af; margin: 12px 0;"></div>
+
+        <table style="width: 100%; font-size: 12px; margin-bottom: 16px; border-collapse: collapse;">
+          <thead>
+            <tr style="text-align: left;"><th style="padding-bottom: 4px;">ART</th><th style="padding-bottom: 4px; text-align: center; font-weight: normal;">QTÉ</th><th style="padding-bottom: 4px; text-align: right; font-weight: normal;">P.U</th><th style="padding-bottom: 4px; text-align: right;">TOTAL</th></tr>
+          </thead>
+          <tbody style="border-top: 1px dashed #e5e7eb;">
+            {#each saleItems as item}
+              <tr style="border-bottom: 1px dashed #e5e7eb;">
+                <td style="padding: 4px 0; text-transform: uppercase; font-weight: bold; font-size: 11px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 100px;">{item.product_name}</td>
+                <td style="padding: 4px 0; text-align: center;">{item.quantity}</td>
+                <td style="padding: 4px 0; text-align: right; font-size: 11px;">{formatPrice(item.unit_price, selectedSale)}</td>
+                <td style="padding: 4px 0; text-align: right; font-weight: bold;">{formatPrice(item.subtotal, selectedSale)}</td>
+              </tr>
+            {/each}
+          </tbody>
+        </table>
+
+        <div style="border-top: 1px dashed #9ca3af; padding-top: 12px; margin-bottom: 16px; font-size: 12px;">
+          <div style="display: flex; justify-content: space-between; margin-bottom: 4px; text-transform: uppercase;">
+            <span>SOUS-TOTAL</span>
+            <span>{formatPrice(selectedSale.subtotal, selectedSale)}</span>
+          </div>
+          <div style="display: flex; justify-content: space-between; margin-bottom: 4px; text-transform: uppercase;">
+            <span>TAXE ({selectedSale.tax_rate}%)</span>
+            <span>{formatPrice(selectedSale.tax_amount, selectedSale)}</span>
+          </div>
+        </div>
+
+        <div style="border-top: 2px double #000000; padding-top: 12px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+          <span style="font-weight: 900; font-size: 14px; text-transform: uppercase;">TOTAL HP</span>
+          <span style="font-size: 18px; font-weight: 900;">{formatPrice(selectedSale.total_amount, selectedSale)}</span>
+        </div>
+
+        <div style="text-align: center; font-weight: bold; font-style: italic;">
+          <p style="margin: 0;">MERCI DE VOTRE VISITE !</p>
+          <p style="font-size: 10px; text-transform: uppercase; font-weight: normal; color: #6b7280; margin: 4px 0 0 0;">A conserver - Ticket client</p>
+        </div>
+      </div>
+
+      <div class="p-4 border-t border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-900/50 flex justify-end print:hidden transition-colors duration-300">
+        <button 
+          type="button"
+          onclick={() => selectedSale = null} 
+          disabled={loadingPDF}
+          class="bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white font-bold px-8 py-2 rounded-lg text-xs transition-colors shadow-lg"
+        >
+          FERMER
+        </button>
+      </div>
+    </div>
+  </div>
+
+/home/njiva/git/point-de-vente/src/routes/admin/settings/+page.svelte:4:25
+Warn: This reference only captures the initial value of `data`. Did you mean to reference it inside a derived instead?
+https://svelte.dev/e/state_referenced_locally (svelte)
+  
+  let settings = $state(data.settings as any);
+  let loading = $state(false);
+
+/home/njiva/git/point-de-vente/src/routes/pos/+page.svelte:10:25
+Warn: This reference only captures the initial value of `data`. Did you mean to reference it inside a derived instead?
+https://svelte.dev/e/state_referenced_locally (svelte)
+
+  let products = $state(data.products as Product[]);
+  let categories = $state(data.categories as any[]);
+
+/home/njiva/git/point-de-vente/src/routes/pos/+page.svelte:11:27
+Warn: This reference only captures the initial value of `data`. Did you mean to reference it inside a derived instead?
+https://svelte.dev/e/state_referenced_locally (svelte)
+  let products = $state(data.products as Product[]);
+  let categories = $state(data.categories as any[]);
+  let clients = $state(data.clients as any[]);
+
+/home/njiva/git/point-de-vente/src/routes/pos/+page.svelte:12:24
+Warn: This reference only captures the initial value of `data`. Did you mean to reference it inside a derived instead?
+https://svelte.dev/e/state_referenced_locally (svelte)
+  let categories = $state(data.categories as any[]);
+  let clients = $state(data.clients as any[]);
+  let posInstances = $state(data.posInstances as any[]);
+
+/home/njiva/git/point-de-vente/src/routes/pos/+page.svelte:13:29
+Warn: This reference only captures the initial value of `data`. Did you mean to reference it inside a derived instead?
+https://svelte.dev/e/state_referenced_locally (svelte)
+  let clients = $state(data.clients as any[]);
+  let posInstances = $state(data.posInstances as any[]);
+
+/home/njiva/git/point-de-vente/src/routes/pos/+page.svelte:18:45
+Warn: This reference only captures the initial value of `data`. Did you mean to reference it inside a derived instead?
+https://svelte.dev/e/state_referenced_locally (svelte)
+  let cart = $state<CartItem[]>([]);
+  let selectedPosId = $state<number | null>(data.posInstances[0]?.id ?? null);
+  let selectedClientId = $state<number | null>(null);
+
+/home/njiva/git/point-de-vente/src/routes/pos/+page.svelte:279:7
+Warn: Buttons and links should either contain text or have an `aria-label`, `aria-labelledby` or `title` attribute
+https://svelte.dev/e/a11y_consider_explicit_label (svelte)
+      <a href="/admin" class="text-gray-500 hover:text-gray-300 text-xs hidden md:block transition-colors">Admin</a>
+      <a href="/" class="text-gray-500 hover:text-gray-300 transition-colors">
+        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg>
+      </a>
+
+/home/njiva/git/point-de-vente/src/routes/pos/+page.svelte:369:5
+Warn: Visible, non-interactive elements with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type="button">` or `<a>` might be more appropriate
+https://svelte.dev/e/a11y_click_events_have_key_events (svelte)
+  {#if sidebarOpen}
+    <div class="fixed inset-0 bg-black/60 z-20 lg:hidden" onclick={() => sidebarOpen = false}></div>
+  {/if}
+
+/home/njiva/git/point-de-vente/src/routes/pos/+page.svelte:369:5
+Warn: `<div>` with a click handler must have an ARIA role
+https://svelte.dev/e/a11y_no_static_element_interactions (svelte)
+  {#if sidebarOpen}
+    <div class="fixed inset-0 bg-black/60 z-20 lg:hidden" onclick={() => sidebarOpen = false}></div>
+  {/if}
+
+/home/njiva/git/point-de-vente/src/routes/pos/+page.svelte:417:15
+Warn: Buttons and links should either contain text or have an `aria-label`, `aria-labelledby` or `title` attribute
+https://svelte.dev/e/a11y_consider_explicit_label (svelte)
+              <button onclick={() => updateQty(item.product.id, +1)} class="w-6 h-6 rounded-md bg-gray-700 hover:bg-gray-600 text-white text-sm flex items-center justify-center transition-colors">+</button>
+              <button onclick={() => removeFromCart(item.product.id)} class="w-6 h-6 rounded-md hover:bg-red-900/50 text-red-500 text-sm flex items-center justify-center ml-1 transition-colors">
+                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+              </button>
+            </div>
+
+/home/njiva/git/point-de-vente/src/routes/pos/+page.svelte:453:11
+Warn: A form label must be associated with a control
+https://svelte.dev/e/a11y_label_has_associated_control (svelte)
+        <div>
+          <label class="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Caisse</label>
+          <select bind:value={selectedPosId} class="w-full bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors">
+
+/home/njiva/git/point-de-vente/src/routes/pos/+page.svelte:461:11
+Warn: A form label must be associated with a control
+https://svelte.dev/e/a11y_label_has_associated_control (svelte)
+        <div>
+          <label class="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Client (optionnel)</label>
+          <select bind:value={selectedClientId} class="w-full bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors">
+
+/home/njiva/git/point-de-vente/src/routes/pos/+page.svelte:470:11
+Warn: A form label must be associated with a control
+https://svelte.dev/e/a11y_label_has_associated_control (svelte)
+        <div>
+          <label class="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">Mode de paiement</label>
+          <div class="grid grid-cols-3 gap-2">
+
+/home/njiva/git/point-de-vente/src/routes/pos/+page.svelte:482:11
+Warn: A form label must be associated with a control
+https://svelte.dev/e/a11y_label_has_associated_control (svelte)
+        <div>
+          <label class="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Note (optionnel)</label>
+          <textarea bind:value={note} rows="2" class="w-full bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none transition-colors" placeholder="Remarque sur la commande..."></textarea>
+
+/home/njiva/git/point-de-vente/src/routes/pos/+page.svelte:501:5
+Warn: Visible, non-interactive elements with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type="button">` or `<a>` might be more appropriate
+https://svelte.dev/e/a11y_click_events_have_key_events (svelte)
+  >
+    <div class="bg-white dark:bg-gray-900 rounded-xl shadow-2xl w-full max-w-[300px] overflow-hidden transition-colors duration-300" onclick={(e) => e.stopPropagation()}>
+      <!-- Modal Header (Controls) -->
+      <div class="bg-gray-100 px-4 py-3 flex items-center justify-between border-b print:hidden">
+        <span class="text-xs font-bold text-gray-500 uppercase tracking-wider">Aperçu du ticket</span>
+        <div class="flex gap-2">
+          <button 
+            type="button"
+            onclick={() => exportToPDF(invoiceData.sale.invoice_ref)} 
+            disabled={loadingPDF}
+            class="bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white text-[10px] font-bold px-2 py-1 rounded transition-colors flex items-center gap-1"
+          >
+            {#if loadingPDF}
+              <span class="animate-spin text-[10px]">⌛</span>
+            {/if}
+            PDF
+          </button>
+          <button 
+            type="button"
+            onclick={printInvoice} 
+            disabled={loadingPDF}
+            class="bg-gray-800 hover:bg-gray-950 disabled:opacity-50 text-white text-[10px] font-bold px-2 py-1 rounded transition-colors flex items-center gap-1"
+          >
+            <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" /></svg>
+            PRINT
+          </button>
+        </div>
+      </div>
+
+      <!-- Thermal Ticket Body -->
+      <div id="thermal-ticket" style="background-color: #ffffff; color: #000000; padding: 24px; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace; font-size: 13px; line-height: 1.25;" class="print:p-0">
+        <div style="text-align: center; margin-bottom: 24px;">
+          <h2 style="font-weight: 900; font-size: 20px; text-transform: uppercase; font-style: italic; margin: 0;">{data.settings.shop_name}</h2>
+          <p style="font-size: 12px; margin: 4px 0 0 0;">{data.settings.shop_address}</p>
+          <p style="font-size: 12px; margin: 4px 0 0 0;">Tél: {data.settings.shop_phone}</p>
+          <div style="border-bottom: 1px dashed #9ca3af; margin: 8px 0; padding-top: 8px;"></div>
+          <p style="font-weight: bold; margin: 0;">FACTURÉ LE {new Date(invoiceData.sale.created_at).toLocaleDateString('fr-FR')}</p>
+          <p style="font-size: 11px; margin: 0;">{new Date(invoiceData.sale.created_at).toLocaleTimeString('fr-FR')}</p>
+        </div>
+
+        <div style="margin-bottom: 16px;">
+          <div style="display: flex; justify-content: space-between;"><span>REF:</span><span style="font-weight: bold;">{invoiceData.sale.invoice_ref}</span></div>
+          <div style="display: flex; justify-content: space-between;"><span>CAISSE:</span><span>{invoiceData.sale.pos_name}</span></div>
+          <div style="display: flex; justify-content: space-between;"><span>CLIENT:</span><span>{invoiceData.sale.client_name ?? 'Anonyme'}</span></div>
+          <div style="display: flex; justify-content: space-between; text-transform: uppercase;">
+            <span>PAIEMENT:</span>
+            <span style="text-align: right;">
+              {paymentLabels[invoiceData.sale.payment_method]}
+              {#if invoiceData.sale.card_number}
+                <br/><span style="font-size: 10px; color: #6b7280; font-style: italic;">#{invoiceData.sale.card_number}</span>
+              {/if}
+            </span>
+          </div>
+        </div>
+
+        <div style="border-bottom: 1px dashed #9ca3af; margin: 12px 0;"></div>
+
+        <table style="width: 100%; font-size: 12px; margin-bottom: 16px; border-collapse: collapse;">
+          <thead>
+            <tr style="text-align: left;"><th style="padding-bottom: 4px;">ART</th><th style="padding-bottom: 4px; text-align: center; font-weight: normal;">QTÉ</th><th style="padding-bottom: 4px; text-align: right; font-weight: normal;">P.U</th><th style="padding-bottom: 4px; text-align: right;">TOTAL</th></tr>
+          </thead>
+          <tbody style="border-top: 1px dashed #e5e7eb;">
+            {#each invoiceData.items as item}
+              <tr style="border-bottom: 1px dashed #e5e7eb;">
+                <td style="padding: 4px 0; text-transform: uppercase; font-weight: bold; font-size: 11px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 100px;">{item.product_name}</td>
+                <td style="padding: 4px 0; text-align: center;">{item.quantity}</td>
+                <td style="padding: 4px 0; text-align: right; font-size: 11px;">{formatPrice(item.unit_price)}</td>
+                <td style="padding: 4px 0; text-align: right; font-weight: bold;">{formatPrice(item.subtotal)}</td>
+              </tr>
+            {/each}
+          </tbody>
+        </table>
+
+        <div style="border-top: 1px dashed #9ca3af; padding-top: 12px; margin-bottom: 16px; font-size: 12px;">
+          <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+            <span>SOUS-TOTAL</span>
+            <span>{formatPrice(invoiceData.sale.subtotal)}</span>
+          </div>
+          <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+            <span>TAXE ({invoiceData.sale.tax_rate}%)</span>
+            <span>{formatPrice(invoiceData.sale.tax_amount)}</span>
+          </div>
+        </div>
+
+        <div style="border-top: 2px double #000000; padding-top: 12px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+          <span style="font-weight: 900; font-size: 14px;">TOTAL</span>
+          <span style="font-size: 18px; font-weight: 900;">{formatPrice(invoiceData.sale.total_amount)}</span>
+        </div>
+
+        <div style="text-align: center; font-weight: bold; font-style: italic;">
+          <p style="margin: 0;">MERCI DE VOTRE VISITE !</p>
+          <p style="font-size: 10px; text-transform: uppercase; font-weight: normal; color: #6b7280; margin: 4px 0 0 0;">A conserver - Ticket client</p>
+        </div>
+      </div>
+
+      <div class="p-4 border-t border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-900/50 flex justify-end print:hidden transition-colors duration-300">
+        <button 
+          type="button"
+          onclick={() => invoiceData = null} 
+          disabled={loadingPDF}
+          class="bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white font-bold px-8 py-2 rounded-lg text-xs transition-colors shadow-lg"
+        >
+          TERMINER
+        </button>
+      </div>
+    </div>
+  </div>
+
+/home/njiva/git/point-de-vente/src/routes/pos/+page.svelte:501:5
+Warn: `<div>` with a click handler must have an ARIA role
+https://svelte.dev/e/a11y_no_static_element_interactions (svelte)
+  >
+    <div class="bg-white dark:bg-gray-900 rounded-xl shadow-2xl w-full max-w-[300px] overflow-hidden transition-colors duration-300" onclick={(e) => e.stopPropagation()}>
+      <!-- Modal Header (Controls) -->
+      <div class="bg-gray-100 px-4 py-3 flex items-center justify-between border-b print:hidden">
+        <span class="text-xs font-bold text-gray-500 uppercase tracking-wider">Aperçu du ticket</span>
+        <div class="flex gap-2">
+          <button 
+            type="button"
+            onclick={() => exportToPDF(invoiceData.sale.invoice_ref)} 
+            disabled={loadingPDF}
+            class="bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white text-[10px] font-bold px-2 py-1 rounded transition-colors flex items-center gap-1"
+          >
+            {#if loadingPDF}
+              <span class="animate-spin text-[10px]">⌛</span>
+            {/if}
+            PDF
+          </button>
+          <button 
+            type="button"
+            onclick={printInvoice} 
+            disabled={loadingPDF}
+            class="bg-gray-800 hover:bg-gray-950 disabled:opacity-50 text-white text-[10px] font-bold px-2 py-1 rounded transition-colors flex items-center gap-1"
+          >
+            <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" /></svg>
+            PRINT
+          </button>
+        </div>
+      </div>
+
+      <!-- Thermal Ticket Body -->
+      <div id="thermal-ticket" style="background-color: #ffffff; color: #000000; padding: 24px; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace; font-size: 13px; line-height: 1.25;" class="print:p-0">
+        <div style="text-align: center; margin-bottom: 24px;">
+          <h2 style="font-weight: 900; font-size: 20px; text-transform: uppercase; font-style: italic; margin: 0;">{data.settings.shop_name}</h2>
+          <p style="font-size: 12px; margin: 4px 0 0 0;">{data.settings.shop_address}</p>
+          <p style="font-size: 12px; margin: 4px 0 0 0;">Tél: {data.settings.shop_phone}</p>
+          <div style="border-bottom: 1px dashed #9ca3af; margin: 8px 0; padding-top: 8px;"></div>
+          <p style="font-weight: bold; margin: 0;">FACTURÉ LE {new Date(invoiceData.sale.created_at).toLocaleDateString('fr-FR')}</p>
+          <p style="font-size: 11px; margin: 0;">{new Date(invoiceData.sale.created_at).toLocaleTimeString('fr-FR')}</p>
+        </div>
+
+        <div style="margin-bottom: 16px;">
+          <div style="display: flex; justify-content: space-between;"><span>REF:</span><span style="font-weight: bold;">{invoiceData.sale.invoice_ref}</span></div>
+          <div style="display: flex; justify-content: space-between;"><span>CAISSE:</span><span>{invoiceData.sale.pos_name}</span></div>
+          <div style="display: flex; justify-content: space-between;"><span>CLIENT:</span><span>{invoiceData.sale.client_name ?? 'Anonyme'}</span></div>
+          <div style="display: flex; justify-content: space-between; text-transform: uppercase;">
+            <span>PAIEMENT:</span>
+            <span style="text-align: right;">
+              {paymentLabels[invoiceData.sale.payment_method]}
+              {#if invoiceData.sale.card_number}
+                <br/><span style="font-size: 10px; color: #6b7280; font-style: italic;">#{invoiceData.sale.card_number}</span>
+              {/if}
+            </span>
+          </div>
+        </div>
+
+        <div style="border-bottom: 1px dashed #9ca3af; margin: 12px 0;"></div>
+
+        <table style="width: 100%; font-size: 12px; margin-bottom: 16px; border-collapse: collapse;">
+          <thead>
+            <tr style="text-align: left;"><th style="padding-bottom: 4px;">ART</th><th style="padding-bottom: 4px; text-align: center; font-weight: normal;">QTÉ</th><th style="padding-bottom: 4px; text-align: right; font-weight: normal;">P.U</th><th style="padding-bottom: 4px; text-align: right;">TOTAL</th></tr>
+          </thead>
+          <tbody style="border-top: 1px dashed #e5e7eb;">
+            {#each invoiceData.items as item}
+              <tr style="border-bottom: 1px dashed #e5e7eb;">
+                <td style="padding: 4px 0; text-transform: uppercase; font-weight: bold; font-size: 11px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 100px;">{item.product_name}</td>
+                <td style="padding: 4px 0; text-align: center;">{item.quantity}</td>
+                <td style="padding: 4px 0; text-align: right; font-size: 11px;">{formatPrice(item.unit_price)}</td>
+                <td style="padding: 4px 0; text-align: right; font-weight: bold;">{formatPrice(item.subtotal)}</td>
+              </tr>
+            {/each}
+          </tbody>
+        </table>
+
+        <div style="border-top: 1px dashed #9ca3af; padding-top: 12px; margin-bottom: 16px; font-size: 12px;">
+          <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+            <span>SOUS-TOTAL</span>
+            <span>{formatPrice(invoiceData.sale.subtotal)}</span>
+          </div>
+          <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+            <span>TAXE ({invoiceData.sale.tax_rate}%)</span>
+            <span>{formatPrice(invoiceData.sale.tax_amount)}</span>
+          </div>
+        </div>
+
+        <div style="border-top: 2px double #000000; padding-top: 12px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+          <span style="font-weight: 900; font-size: 14px;">TOTAL</span>
+          <span style="font-size: 18px; font-weight: 900;">{formatPrice(invoiceData.sale.total_amount)}</span>
+        </div>
+
+        <div style="text-align: center; font-weight: bold; font-style: italic;">
+          <p style="margin: 0;">MERCI DE VOTRE VISITE !</p>
+          <p style="font-size: 10px; text-transform: uppercase; font-weight: normal; color: #6b7280; margin: 4px 0 0 0;">A conserver - Ticket client</p>
+        </div>
+      </div>
+
+      <div class="p-4 border-t border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-900/50 flex justify-end print:hidden transition-colors duration-300">
+        <button 
+          type="button"
+          onclick={() => invoiceData = null} 
+          disabled={loadingPDF}
+          class="bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white font-bold px-8 py-2 rounded-lg text-xs transition-colors shadow-lg"
+        >
+          TERMINER
+        </button>
+      </div>
+    </div>
+  </div>
+
+====================================
+svelte-check found 3 errors and 49 warnings in 8 files

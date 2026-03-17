@@ -3,19 +3,21 @@ import { join } from 'path';
 
 const DB_PATH = join(process.cwd(), 'data', 'pos.db');
 
-let db: Database.Database;
+let dbInstance: Database.Database;
 
 export function getDb(): Database.Database {
-	if (!db) {
+	if (!dbInstance) {
 		// Ensure directory exists
 		import('fs').then(fs => fs.mkdirSync(join(process.cwd(), 'data'), { recursive: true }));
-		db = new Database(DB_PATH);
-		db.pragma('journal_mode = WAL');
-		db.pragma('foreign_keys = ON');
-		initSchema(db);
+		dbInstance = new Database(DB_PATH);
+		dbInstance.pragma('journal_mode = WAL');
+		dbInstance.pragma('foreign_keys = ON');
+		initSchema(dbInstance);
 	}
-	return db;
+	return dbInstance;
 }
+
+export const db = getDb();
 
 function initSchema(db: Database.Database) {
 	db.exec(`

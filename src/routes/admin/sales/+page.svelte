@@ -140,36 +140,36 @@
 
   <div class="relative">
     <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M17 11A6 6 0 105 11a6 6 0 0012 0z" /></svg>
-    <input bind:value={search} placeholder="Rechercher par ref, client ou caisse..." class="w-full pl-9 pr-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+    <input bind:value={search} placeholder="Rechercher par ref, client ou caisse..." class="w-full pl-9 pr-4 py-2.5 bg-white dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors" />
   </div>
 
-  <div class="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
+  <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 shadow-sm overflow-hidden transition-colors duration-300">
     <div class="overflow-x-auto">
       <table class="w-full text-sm">
-        <thead class="bg-gray-50 border-b border-gray-100">
+        <thead class="bg-gray-50 dark:bg-gray-900/50 border-b border-gray-100 dark:border-gray-700">
           <tr>
-            <th class="px-4 py-3 text-left font-semibold text-gray-600">Référence</th>
-            <th class="px-4 py-3 text-left font-semibold text-gray-600 hidden sm:table-cell">Caisse</th>
-            <th class="px-4 py-3 text-left font-semibold text-gray-600 hidden md:table-cell">Client</th>
-            <th class="px-4 py-3 text-left font-semibold text-gray-600 hidden lg:table-cell">Paiement</th>
-            <th class="px-4 py-3 text-right font-semibold text-gray-600">Montant</th>
-            <th class="px-4 py-3 text-right font-semibold text-gray-600">Date</th>
-            <th class="px-4 py-3 text-right font-semibold text-gray-600">Action</th>
+            <th class="px-4 py-3 text-left font-semibold text-gray-600 dark:text-gray-400">Référence</th>
+            <th class="px-4 py-3 text-left font-semibold text-gray-600 dark:text-gray-400 hidden sm:table-cell">Caisse</th>
+            <th class="px-4 py-3 text-left font-semibold text-gray-600 dark:text-gray-400 hidden md:table-cell">Client</th>
+            <th class="px-4 py-3 text-left font-semibold text-gray-600 dark:text-gray-400 hidden lg:table-cell">Paiement</th>
+            <th class="px-4 py-3 text-right font-semibold text-gray-600 dark:text-gray-400">Montant</th>
+            <th class="px-4 py-3 text-right font-semibold text-gray-600 dark:text-gray-400">Date</th>
+            <th class="px-4 py-3 text-right font-semibold text-gray-600 dark:text-gray-400">Action</th>
           </tr>
         </thead>
-        <tbody class="divide-y divide-gray-50">
+        <tbody class="divide-y divide-gray-50 dark:divide-gray-700">
           {#each filtered as sale}
-            <tr class="hover:bg-gray-50 transition-colors">
-              <td class="px-4 py-3 font-mono text-xs text-blue-700 font-semibold">{sale.invoice_ref}</td>
-              <td class="px-4 py-3 text-gray-600 hidden sm:table-cell">{sale.pos_name}</td>
-              <td class="px-4 py-3 text-gray-600 hidden md:table-cell">{sale.client_name ?? 'Anonyme'}</td>
+            <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+              <td class="px-4 py-3 font-mono text-xs text-blue-700 dark:text-blue-400 font-semibold">{sale.invoice_ref}</td>
+              <td class="px-4 py-3 text-gray-600 dark:text-gray-400 hidden sm:table-cell">{sale.pos_name}</td>
+              <td class="px-4 py-3 text-gray-600 dark:text-gray-400 hidden md:table-cell">{sale.client_name ?? 'Anonyme'}</td>
               <td class="px-4 py-3 hidden lg:table-cell">
-                <span class="text-xs px-2 py-0.5 bg-gray-100 rounded-full">{paymentLabels[sale.payment_method] ?? sale.payment_method}</span>
+                <span class="text-xs px-2 py-0.5 bg-gray-100 dark:bg-gray-900 text-gray-600 dark:text-gray-400 rounded-full">{paymentLabels[sale.payment_method] ?? sale.payment_method}</span>
               </td>
-              <td class="px-4 py-3 text-right font-bold text-gray-900 whitespace-nowrap">{formatPrice(sale.total_amount, sale)}</td>
-              <td class="px-4 py-3 text-right text-gray-500 text-xs whitespace-nowrap">{new Date(sale.created_at).toLocaleString('fr-FR', { day: '2-digit', month: '2-digit', year: '2-digit', hour: '2-digit', minute: '2-digit' })}</td>
+              <td class="px-4 py-3 text-right font-bold text-gray-900 dark:text-white whitespace-nowrap">{formatPrice(sale.total_amount, sale)}</td>
+              <td class="px-4 py-3 text-right text-gray-500 dark:text-gray-500 text-xs whitespace-nowrap">{new Date(sale.created_at).toLocaleString('fr-FR', { day: '2-digit', month: '2-digit', year: '2-digit', hour: '2-digit', minute: '2-digit' })}</td>
               <td class="px-4 py-3 text-right">
-                <button onclick={() => viewSale(sale.id)} class="text-blue-600 hover:text-blue-800 text-xs font-semibold underline">Voir</button>
+                <button onclick={() => viewSale(sale.id)} class="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 text-xs font-semibold underline">Voir</button>
               </td>
             </tr>
           {:else}
@@ -183,12 +183,12 @@
 
 {#if selectedSale}
   <div 
-    class="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4 overflow-y-auto" 
+    class="fixed inset-0 bg-black/80 dark:bg-black/90 z-50 flex items-center justify-center p-4 overflow-y-auto transition-colors duration-300" 
   >
-    <div class="bg-white rounded-xl shadow-2xl w-full max-w-[300px] overflow-hidden" onclick={(e) => e.stopPropagation()}>
+    <div class="bg-white dark:bg-gray-900 border dark:border-gray-800 rounded-xl shadow-2xl w-full max-w-[300px] overflow-hidden transition-colors duration-300" onclick={(e) => e.stopPropagation()}>
       <!-- Modal Header (Controls) -->
-      <div class="bg-gray-100 px-4 py-3 flex items-center justify-between border-b print:hidden">
-        <span class="text-xs font-bold text-gray-500 uppercase tracking-wider">Aperçu du ticket</span>
+      <div class="bg-gray-100 dark:bg-gray-800 px-4 py-3 flex items-center justify-between border-b dark:border-gray-700 print:hidden transition-colors">
+        <span class="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Aperçu du ticket</span>
         <div class="flex gap-2">
           <button 
             type="button"
@@ -279,7 +279,7 @@
         </div>
       </div>
 
-      <div class="p-4 border-t bg-gray-50 flex justify-end print:hidden">
+      <div class="p-4 border-t border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-900/50 flex justify-end print:hidden transition-colors duration-300">
         <button 
           type="button"
           onclick={() => selectedSale = null} 

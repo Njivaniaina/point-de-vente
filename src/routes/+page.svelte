@@ -1,17 +1,36 @@
 <script lang="ts">
-  let { data } = $props();
+  import { theme, toggleTheme } from '$lib/theme';
+  let { data } = $props() as any;
 </script>
 
 <svelte:head>
   <title>{data.settings.shop_name || 'ShopPOS'} — Gestion de point de vente locale</title>
 </svelte:head>
 
-<div class="relative min-h-screen bg-gray-950 flex flex-col items-center justify-center p-6 text-center overflow-hidden">
+<div class="relative min-h-screen bg-white dark:bg-gray-950 flex flex-col items-center justify-center p-6 text-center overflow-hidden transition-colors duration-500">
   <!-- Gradient Background -->
-  <div class="absolute inset-0 bg-gradient-to-br from-blue-900/20 via-gray-900 to-emerald-900/20 z-0"></div>
-  <div class="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_50%_50%,_rgba(30,58,138,0.15),_transparent_50%)] z-0"></div>
+  <div class="absolute inset-0 bg-blue-50/50 dark:bg-blue-900/10 z-0"></div>
+  <div class="absolute inset-0 bg-gradient-to-br from-blue-100/20 via-white dark:via-gray-950 to-emerald-100/20 z-0"></div>
+  <div class="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_50%_50%,_rgba(30,58,138,0.05),_transparent_50%)] dark:bg-[radial-gradient(circle_at_50%_50%,_rgba(30,58,138,0.15),_transparent_50%)] z-0"></div>
 
   <div class="relative z-10 max-w-4xl w-full">
+    <!-- Theme Toggle Floating -->
+    <div class="absolute -top-12 right-0">
+      <button 
+        onclick={toggleTheme}
+        class="p-2 rounded-xl bg-gray-100 dark:bg-gray-900 text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors shadow-sm"
+      >
+        {#if $theme === 'light'}
+          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+          </svg>
+        {:else}
+          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M6.343 6.343l-.707-.707M12 5a7 7 0 100 14 7 7 0 000-14z" />
+          </svg>
+        {/if}
+      </button>
+    </div>
     <!-- Logo -->
     <div class="flex items-center justify-center gap-4 mb-12 animate-in fade-in slide-in-from-bottom-4 duration-700">
       <div class="w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center shadow-2xl shadow-blue-600/40 rotate-3 hover:rotate-0 transition-transform cursor-pointer">
@@ -19,16 +38,16 @@
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-1.5 6h13M7 13L5.4 5M9 19a1 1 0 100 2 1 1 0 000-2zm10 0a1 1 0 100 2 1 1 0 000-2z" />
         </svg>
       </div>
-      <span class="text-white text-3xl font-bold tracking-wide">{data.settings.shop_name || 'ShopPOS'}</span>
+      <span class="text-gray-900 dark:text-white text-3xl font-bold tracking-wide">{data.settings.shop_name || 'ShopPOS'}</span>
     </div>
 
     <!-- Hero Section -->
-    <h1 class="text-5xl md:text-6xl font-black text-white mb-4 leading-tight animate-in fade-in slide-in-from-bottom-6 duration-1000 fill-mode-both">
+    <h1 class="text-5xl md:text-6xl font-black text-gray-950 dark:text-white mb-4 leading-tight animate-in fade-in slide-in-from-bottom-6 duration-1000 fill-mode-both">
       Votre Caisse,<br/>
       <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-emerald-400">Simplifiée à l'Extrême.</span>
     </h1>
     
-    <p class="text-gray-400 text-lg md:text-xl max-w-2xl mx-auto mb-12 animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-200 fill-mode-both">
+    <p class="text-gray-600 dark:text-gray-400 text-lg md:text-xl max-w-2xl mx-auto mb-12 animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-200 fill-mode-both">
       Gérez vos produits, suivez vos stocks et encaissez vos clients avec une interface fluide, moderne et performante.
     </p>
 
@@ -47,7 +66,7 @@
 
       <a 
         href="/admin" 
-        class="group px-8 py-4 bg-gray-800 rounded-2xl text-gray-200 font-bold text-lg hover:bg-gray-700 hover:text-white transition-all flex items-center gap-3 border border-gray-700"
+        class="group px-8 py-4 bg-white dark:bg-gray-800 rounded-2xl text-gray-700 dark:text-gray-200 font-bold text-lg hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-blue-600 dark:hover:text-white transition-all flex items-center gap-3 border border-gray-200 dark:border-gray-700 shadow-sm"
       >
         <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37a1.724 1.724 0 002.572-1.065z" />
@@ -57,7 +76,7 @@
     </div>
   </div>
 
-  <p class="relative z-10 text-gray-700 text-xs mt-12">{data.settings.shop_name || 'ShopPOS'} v1.0 — Gestion de boutique locale</p>
+  <p class="relative z-10 text-gray-400 dark:text-gray-700 text-xs mt-12">{data.settings.shop_name || 'ShopPOS'} v1.0 — Gestion de boutique locale</p>
 </div>
 
 <style>

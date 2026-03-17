@@ -1,8 +1,6 @@
 <script lang="ts">
-  import type { PageData } from './$types.js';
   import { goto } from '$app/navigation';
-
-  let { data }: { data: PageData } = $props();
+  let { data } = $props() as any;
   let posInstances = $state(data.posInstances as any[]);
   let showModal = $state(false);
   let editTarget = $state<any>(null);
@@ -44,8 +42,8 @@
 <div class="space-y-6">
   <div class="flex items-center justify-between">
     <div>
-      <h1 class="text-2xl font-bold text-gray-900">Caisses (POS)</h1>
-      <p class="text-gray-500 text-sm mt-1">{posInstances.filter((p: any) => p.active).length} caisse(s) active(s)</p>
+      <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Caisses (POS)</h1>
+      <p class="text-gray-500 dark:text-gray-400 text-sm mt-1">{posInstances.filter((p: any) => p.active).length} caisse(s) active(s)</p>
     </div>
     <button onclick={openNew} class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 rounded-xl flex items-center gap-2 transition-colors">
       <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
@@ -55,27 +53,27 @@
 
   <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
     {#each posInstances as pos}
-      <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-5 {pos.active ? '' : 'opacity-60'}">
+      <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 shadow-sm p-5 transition-all {pos.active ? '' : 'opacity-60'}">
         <div class="flex items-start justify-between mb-3">
-          <div class="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center">
-            <svg class="w-5 h-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <div class="w-10 h-10 bg-blue-100 dark:bg-blue-900/30 rounded-xl flex items-center justify-center transition-colors">
+            <svg class="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 11h.01M12 11h.01M15 11h.01M4 19h16a2 2 0 002-2V7a2 2 0 00-2-2H4a2 2 0 00-2 2v10a2 2 0 002 2z" />
             </svg>
           </div>
-          <span class="text-xs font-semibold px-2 py-0.5 rounded-full {pos.active ? 'bg-emerald-100 text-emerald-700' : 'bg-gray-100 text-gray-500'}">
+          <span class="text-xs font-semibold px-2 py-0.5 rounded-full {pos.active ? 'bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-400' : 'bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400'} transition-colors">
             {pos.active ? 'Active' : 'Inactive'}
           </span>
         </div>
-        <h3 class="font-bold text-gray-900">{pos.name}</h3>
-        <p class="text-gray-500 text-sm">{pos.location ?? 'Aucun emplacement'}</p>
+        <h3 class="font-bold text-gray-900 dark:text-white">{pos.name}</h3>
+        <p class="text-gray-500 dark:text-gray-400 text-sm">{pos.location ?? 'Aucun emplacement'}</p>
         <div class="mt-4 flex gap-2">
-          <button onclick={() => goto('/pos')} class="flex-1 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold py-2 rounded-lg transition-colors">
+          <button onclick={() => goto('/pos')} aria-label="Ouvrir la caisse" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold py-2 rounded-lg transition-colors">
             Ouvrir
           </button>
-          <button onclick={() => openEdit(pos)} class="p-2 rounded-lg text-gray-400 hover:bg-gray-100 transition-colors">
+          <button onclick={() => openEdit(pos)} aria-label="Modifier la caisse" class="p-2 rounded-lg text-gray-400 dark:text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
             <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
           </button>
-          <button onclick={() => toggleActive(pos)} class="p-2 rounded-lg text-gray-400 hover:bg-gray-100 transition-colors" title="{pos.active ? 'Désactiver' : 'Activer'}">
+          <button onclick={() => toggleActive(pos)} aria-label={pos.active ? 'Désactiver la caisse' : 'Activer la caisse'} class="p-2 rounded-lg text-gray-400 dark:text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors" title="{pos.active ? 'Désactiver' : 'Activer'}">
             <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d={pos.active ? "M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" : "M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"} /></svg>
           </button>
         </div>
@@ -87,22 +85,22 @@
 </div>
 
 {#if showModal}
-  <div class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md">
-      <div class="px-6 py-5 border-b"><h2 class="font-bold text-gray-900 text-lg">{editTarget?.id ? 'Modifier' : 'Nouvelle'} caisse</h2></div>
+  <div class="fixed inset-0 bg-black/50 dark:bg-black/80 z-50 flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-gray-900 border dark:border-gray-800 rounded-2xl shadow-2xl w-full max-w-md transition-colors duration-300">
+      <div class="px-6 py-5 border-b dark:border-gray-800"><h2 class="font-bold text-gray-900 dark:text-white text-lg">{editTarget?.id ? 'Modifier' : 'Nouvelle'} caisse</h2></div>
       <div class="p-6 space-y-4">
-        {#if error}<p class="text-red-600 text-sm bg-red-50 rounded-lg px-3 py-2">{error}</p>{/if}
+        {#if error}<p class="text-red-600 text-sm bg-red-50 dark:bg-red-900/20 rounded-lg px-3 py-2">{error}</p>{/if}
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Nom *</label>
-          <input bind:value={editTarget.name} class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Ex: Caisse 1" />
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Nom *</label>
+          <input bind:value={editTarget.name} class="w-full bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-300 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors" placeholder="Ex: Caisse 1" />
         </div>
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Emplacement</label>
-          <input bind:value={editTarget.location} class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Ex: Rez-de-chaussée" />
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Emplacement</label>
+          <input bind:value={editTarget.location} class="w-full bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-300 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors" placeholder="Ex: Rez-de-chaussée" />
         </div>
       </div>
-      <div class="px-6 py-4 border-t flex gap-3 justify-end">
-        <button onclick={() => showModal = false} class="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-lg transition-colors">Annuler</button>
+      <div class="px-6 py-4 border-t dark:border-gray-800 flex gap-3 justify-end">
+        <button onclick={() => showModal = false} class="px-4 py-2 text-sm text-gray-700 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors">Annuler</button>
         <button onclick={save} disabled={loading} class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-5 py-2 rounded-lg text-sm transition-colors disabled:opacity-50">
           {loading ? 'Enregistrement...' : 'Enregistrer'}
         </button>

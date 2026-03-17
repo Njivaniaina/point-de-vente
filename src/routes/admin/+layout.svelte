@@ -1,8 +1,9 @@
 <script lang="ts">
   import { page } from '$app/stores';
   import { goto } from '$app/navigation';
+  import { theme, toggleTheme } from '$lib/theme';
 
-  let { data, children } = $props();
+  let { data, children } = $props() as any;
 
   const navItems = [
     { href: '/admin', label: 'Tableau de bord', icon: 'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6' },
@@ -17,10 +18,17 @@
   let sidebarOpen = $state(false);
 </script>
 
-<div class="flex h-screen bg-gray-100 overflow-hidden">
+<div class="flex h-screen bg-gray-100 dark:bg-gray-900 overflow-hidden transition-colors duration-300">
   <!-- Sidebar Overlay (mobile) -->
   {#if sidebarOpen}
-    <div class="fixed inset-0 bg-black/50 z-20 lg:hidden" onclick={() => sidebarOpen = false}></div>
+    <div 
+      role="button"
+      tabindex="0"
+      class="fixed inset-0 bg-black/50 z-20 lg:hidden" 
+      onclick={() => sidebarOpen = false}
+      onkeydown={(e) => e.key === 'Enter' && (sidebarOpen = false)}
+      aria-label="Close sidebar"
+    ></div>
   {/if}
 
   <!-- Sidebar -->
@@ -60,8 +68,26 @@
       {/each}
     </nav>
 
-    <!-- Footer -->
-    <div class="px-3 py-4 border-t border-gray-800">
+    <!-- Theme Toggle & Local Return -->
+    <div class="px-3 py-4 border-t border-gray-800 space-y-2">
+      <button
+        onclick={toggleTheme}
+        aria-label={$theme === 'light' ? 'Activer le mode sombre' : 'Activer le mode clair'}
+        class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-gray-400 hover:text-white hover:bg-gray-800 transition-all duration-150"
+      >
+        {#if $theme === 'light'}
+          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+          </svg>
+          Mode Sombre
+        {:else}
+          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M6.343 6.343l-.707-.707M12 5a7 7 0 100 14 7 7 0 000-14z" />
+          </svg>
+          Mode Clair
+        {/if}
+      </button>
+
       <a
         href="/"
         class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-gray-500 hover:text-white hover:bg-gray-800 transition-all duration-150"
@@ -77,13 +103,17 @@
   <!-- Main content -->
   <div class="flex-1 flex flex-col min-w-0 overflow-hidden">
     <!-- Top bar (mobile) -->
-    <header class="lg:hidden flex items-center justify-between px-4 py-3 bg-white border-b border-gray-200 shadow-sm">
-      <button onclick={() => sidebarOpen = !sidebarOpen} class="p-2 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors">
+    <header class="lg:hidden flex items-center justify-between px-4 py-3 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 shadow-sm transition-colors duration-300">
+      <button 
+        onclick={() => sidebarOpen = !sidebarOpen} 
+        aria-label="Toggle sidebar"
+        class="p-2 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors"
+      >
         <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
         </svg>
       </button>
-      <span class="font-bold text-gray-900">{data.settings.shop_name || 'ShopPOS'} Admin</span>
+      <span class="font-bold text-gray-900 dark:text-white">{data.settings.shop_name || 'ShopPOS'} Admin</span>
       <button onclick={() => goto('/pos')} class="bg-blue-600 text-white text-xs font-bold px-3 py-1.5 rounded-lg">Caisse</button>
     </header>
 

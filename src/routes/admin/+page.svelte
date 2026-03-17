@@ -1,5 +1,5 @@
 <script lang="ts">
-  let { data } = $props();
+  let { data } = $props() as any;
 
   function formatPrice(amount: number, saleContext?: any) {
     const currency = saleContext ? (saleContext.currency || 'MGA') : (data.settings.currency || 'MGA');
@@ -36,44 +36,44 @@
 
 <div class="space-y-6">
   <div>
-    <h1 class="text-2xl font-bold text-gray-900">Tableau de bord</h1>
-    <p class="text-gray-500 text-sm mt-1">Vue d'ensemble de votre activité commerciale</p>
+    <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Tableau de bord</h1>
+    <p class="text-gray-500 dark:text-gray-400 text-sm mt-1">Vue d'ensemble de votre activité commerciale</p>
   </div>
 
   <!-- Stats Grid -->
   <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
     {#each stats as stat}
-      <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-5 flex flex-col gap-3">
+      <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-5 flex flex-col gap-3 transition-colors duration-300">
         <div class="flex items-center justify-between">
-          <span class="text-gray-500 text-xs font-medium">{stat.label}</span>
+          <span class="text-gray-500 dark:text-gray-400 text-xs font-medium">{stat.label}</span>
           <div class="{stat.color} w-8 h-8 rounded-lg flex items-center justify-center">
             <svg class="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d={stat.icon} />
             </svg>
           </div>
         </div>
-        <p class="text-2xl font-black text-gray-900">{stat.value}</p>
+        <p class="text-2xl font-black text-gray-900 dark:text-white">{stat.value}</p>
       </div>
     {/each}
   </div>
 
   <div class="grid lg:grid-cols-2 gap-6">
     <!-- Recent Sales -->
-    <div class="bg-white rounded-xl shadow-sm border border-gray-100">
-      <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
-        <h2 class="font-semibold text-gray-900">Ventes récentes</h2>
-        <a href="/admin/sales" class="text-blue-600 text-sm hover:underline">Voir tout</a>
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden transition-colors duration-300">
+      <div class="px-6 py-4 border-b border-gray-100 dark:border-gray-700 flex items-center justify-between">
+        <h2 class="font-semibold text-gray-900 dark:text-white">Ventes récentes</h2>
+        <a href="/admin/sales" class="text-blue-600 dark:text-blue-400 text-sm hover:underline">Voir tout</a>
       </div>
-      <div class="divide-y divide-gray-50">
+      <div class="divide-y divide-gray-50 dark:divide-gray-700">
         {#each data.recentSales as sale}
-          <div class="px-6 py-3 flex items-center justify-between hover:bg-gray-50 transition-colors">
+          <div class="px-6 py-3 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
             <div>
-              <p class="font-medium text-gray-900 text-sm">{sale.invoice_ref}</p>
-              <p class="text-gray-400 text-xs">{sale.pos_name} · {sale.client_name ?? 'Client anonyme'}</p>
+              <p class="font-medium text-gray-900 dark:text-white text-sm">{sale.invoice_ref}</p>
+              <p class="text-gray-400 dark:text-gray-500 text-xs">{sale.pos_name} · {sale.client_name ?? 'Client anonyme'}</p>
             </div>
             <div class="text-right">
-              <p class="font-bold text-gray-900 text-sm">{formatPrice(sale.total_amount, sale)}</p>
-              <p class="text-gray-400 text-xs">{new Date(sale.created_at).toLocaleDateString('fr-FR')}</p>
+              <p class="font-bold text-gray-900 dark:text-white text-sm">{formatPrice(sale.total_amount, sale)}</p>
+              <p class="text-gray-400 dark:text-gray-500 text-xs">{new Date(sale.created_at).toLocaleDateString('fr-FR')}</p>
             </div>
           </div>
         {:else}
@@ -83,18 +83,18 @@
     </div>
 
     <!-- Revenue Summary -->
-    <div class="bg-white rounded-xl shadow-sm border border-gray-100">
-      <div class="px-6 py-4 border-b border-gray-100">
-        <h2 class="font-semibold text-gray-900">Résumé financier</h2>
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden transition-colors duration-300">
+      <div class="px-6 py-4 border-b border-gray-100 dark:border-gray-700">
+        <h2 class="font-semibold text-gray-900 dark:text-white">Résumé financier</h2>
       </div>
       <div class="p-6 space-y-4">
-        <div class="flex items-center justify-between p-4 bg-blue-50 rounded-xl">
-          <span class="text-blue-700 font-medium text-sm">Chiffre d'affaires total</span>
-          <span class="text-blue-900 font-black text-lg">{formatPrice(data.totalRevenue)}</span>
+        <div class="flex items-center justify-between p-4 bg-blue-50 dark:bg-blue-900/20 rounded-xl transition-colors">
+          <span class="text-blue-700 dark:text-blue-300 font-medium text-sm">Chiffre d'affaires total</span>
+          <span class="text-blue-900 dark:text-blue-100 font-black text-lg">{formatPrice(data.totalRevenue)}</span>
         </div>
-        <div class="flex items-center justify-between p-4 bg-amber-50 rounded-xl">
-          <span class="text-amber-700 font-medium text-sm">Aujourd'hui</span>
-          <span class="text-amber-900 font-black text-lg">{formatPrice(data.todayRevenue)}</span>
+        <div class="flex items-center justify-between p-4 bg-amber-50 dark:bg-amber-900/20 rounded-xl transition-colors">
+          <span class="text-amber-700 dark:text-amber-300 font-medium text-sm">Aujourd'hui</span>
+          <span class="text-amber-900 dark:text-amber-100 font-black text-lg">{formatPrice(data.todayRevenue)}</span>
         </div>
         <div class="pt-2">
           <a href="/pos" class="flex items-center justify-center gap-2 w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl transition-colors">

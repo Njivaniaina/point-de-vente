@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { PageData } from './$types.js';
+  import { theme, toggleTheme } from '$lib/theme';
 
   let { data } = $props() as any;
 
@@ -227,11 +228,11 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 </svelte:head>
 
-<div class="flex h-screen bg-gray-950 overflow-hidden">
+<div class="flex h-screen bg-gray-50 dark:bg-gray-950 overflow-hidden text-gray-900 dark:text-gray-100 transition-colors duration-300">
   <!-- Products Section -->
   <div class="flex-1 flex flex-col min-w-0">
     <!-- Top Bar -->
-    <header class="bg-gray-900 border-b border-gray-800 px-4 py-3 flex items-center gap-3 shrink-0">
+    <header class="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 px-4 py-3 flex items-center gap-3 shrink-0 transition-colors duration-300">
       <div class="flex items-center gap-2 shrink-0">
         <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
           <svg class="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -241,8 +242,26 @@
         <span class="text-white font-bold text-sm hidden sm:block">{data.settings.shop_name || 'ShopPOS'}</span>
       </div>
 
+      <!-- Theme Toggle -->
+      <button 
+        onclick={toggleTheme}
+        class="p-2 rounded-lg text-gray-400 hover:text-white hover:bg-gray-800 transition-colors"
+        title="Changer le thème"
+        aria-label="Changer le thème"
+      >
+        {#if $theme === 'light'}
+          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+          </svg>
+        {:else}
+          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M6.343 6.343l-.707-.707M12 5a7 7 0 100 14 7 7 0 000-14z" />
+          </svg>
+        {/if}
+      </button>
+
       <!-- Caisse selector -->
-      <select bind:value={selectedPosId} class="bg-gray-800 text-gray-200 text-sm border border-gray-700 rounded-lg px-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-blue-500 hidden sm:block">
+      <select bind:value={selectedPosId} class="bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-200 text-xs border border-gray-200 dark:border-gray-700 rounded-lg px-2 py-1 focus:outline-none focus:ring-1 focus:ring-blue-500 hidden md:block transition-colors duration-300">
         {#each posInstances as pos}
           <option value={pos.id}>{pos.name}</option>
         {/each}
@@ -253,7 +272,7 @@
           <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M17 11A6 6 0 105 11a6 6 0 0012 0z" />
           </svg>
-          <input bind:value={search} placeholder="Rechercher un produit..." class="w-full bg-gray-800 text-gray-200 text-sm border border-gray-700 rounded-lg pl-9 pr-4 py-1.5 focus:outline-none focus:ring-1 focus:ring-blue-500 placeholder-gray-500" />
+          <input bind:value={search} placeholder="Rechercher un produit..." class="w-full bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-200 text-sm border border-gray-200 dark:border-gray-700 rounded-lg pl-9 pr-4 py-1.5 focus:outline-none focus:ring-1 focus:ring-blue-500 placeholder-gray-400 dark:placeholder-gray-500 transition-colors duration-300" />
         </div>
       </div>
 
@@ -274,7 +293,7 @@
     </header>
 
     <!-- Category Tabs -->
-    <div class="bg-gray-900 border-b border-gray-800 px-4 py-2 flex gap-2 overflow-x-auto shrink-0 scrollbar-none">
+    <div class="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 px-4 py-2 flex gap-2 overflow-x-auto shrink-0 transition-colors duration-300 scrollbar-none">
       <button
         onclick={() => selectedCategoryId = null}
         class="shrink-0 px-3 py-1.5 rounded-full text-xs font-semibold transition-all
@@ -286,7 +305,7 @@
         <button
           onclick={() => selectedCategoryId = cat.id}
           class="shrink-0 px-3 py-1.5 rounded-full text-xs font-semibold transition-all flex items-center gap-1.5
-            {selectedCategoryId === cat.id ? 'text-white' : 'bg-gray-800 text-gray-400 hover:text-gray-200'}"
+            {selectedCategoryId === cat.id ? 'text-white' : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'}"
           style={selectedCategoryId === cat.id ? `background-color: ${cat.color}` : ''}
         >
           <span class="w-2 h-2 rounded-full shrink-0" style="background-color: {cat.color}"></span>
@@ -298,7 +317,7 @@
     <!-- Products Grid -->
     <div class="flex-1 overflow-y-auto p-4">
       {#if filtered.length === 0}
-        <div class="h-full flex items-center justify-center text-gray-600">
+        <div class="h-full flex items-center justify-center text-gray-400 dark:text-gray-600">
           <div class="text-center">
             <svg class="w-12 h-12 mx-auto mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" /></svg>
             <p>Aucun produit disponible</p>
@@ -311,20 +330,14 @@
             <button
               onclick={() => addToCart(product)}
               disabled={product.stock <= 0}
-              class="bg-gray-900 border-2 rounded-xl p-3 text-left transition-all duration-150 hover:shadow-lg hover:-translate-y-0.5 active:scale-95
-                {product.stock <= 0 ? 'opacity-50 grayscale cursor-not-allowed border-gray-800' : 'cursor-pointer'}
-                {cartItem && product.stock > 0 ? 'border-blue-500 shadow-blue-600/20 shadow-lg' : 'border-gray-800 hover:border-gray-600'}"
+              class="bg-white dark:bg-gray-900 border-2 rounded-xl p-3 text-left transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5 active:scale-95
+                {product.stock <= 0 ? 'opacity-50 grayscale cursor-not-allowed border-gray-100 dark:border-gray-800' : 'cursor-pointer'}
+                {cartItem && product.stock > 0 ? 'border-blue-500 shadow-blue-600/20 shadow-lg' : 'border-gray-100 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-600'}"
             >
               <!-- Product image / placeholder -->
-              <div class="relative w-full aspect-square rounded-lg mb-3 flex items-center justify-center overflow-hidden"
+              <div class="relative w-full aspect-square rounded-lg mb-3 flex items-center justify-center overflow-hidden mix-blend-multiply dark:mix-blend-normal"
                 style="background-color: {product.category_color ?? '#1f2937'}20">
-                {#if product.image_url}
-                  <img src={product.image_url} alt={product.name} class="w-full h-full object-cover rounded-lg" />
-                {:else}
-                  <svg class="w-10 h-10" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="color: {product.category_color ?? '#6b7280'}">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-                  </svg>
-                {/if}
+                <img src={product.image_url || '/default-product.png'} alt={product.name} class="w-full h-full object-cover rounded-lg" />
                 
                 <!-- Stock Badge -->
                 <div class="absolute bottom-1 right-1 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider
@@ -332,7 +345,7 @@
                   {product.stock <= 0 ? 'Épuisé' : `Stock: ${product.stock}`}
                 </div>
               </div>
-              <p class="text-white text-xs font-semibold leading-tight line-clamp-2 mb-1">{product.name}</p>
+              <p class="text-gray-900 dark:text-white text-xs font-semibold leading-tight line-clamp-2 mb-1">{product.name}</p>
               <div class="flex justify-between items-center mt-3">
                 <span class="text-blue-600 font-bold">{formatPrice(product.price)}</span>
                 {#if cartItem}
@@ -348,15 +361,19 @@
 
   <!-- Cart Sidebar Overlay (mobile) -->
   {#if sidebarOpen}
-    <div class="fixed inset-0 bg-black/60 z-20 lg:hidden" onclick={() => sidebarOpen = false}></div>
+    <button 
+      class="fixed inset-0 bg-black/60 z-20 lg:hidden w-full h-full cursor-default" 
+      onclick={() => sidebarOpen = false} 
+      aria-label="Fermer le panier"
+    ></button>
   {/if}
 
   <!-- Cart -->
   <aside class="
-    fixed inset-y-0 right-0 z-30 w-80 bg-gray-900 border-l border-gray-800 flex flex-col
+    fixed inset-y-0 right-0 z-30 w-80 bg-white dark:bg-gray-900 border-l border-gray-200 dark:border-gray-800 flex flex-col
     transform transition-transform duration-300
     {sidebarOpen ? 'translate-x-0' : 'translate-x-full'}
-    lg:static lg:translate-x-0 lg:z-auto lg:w-80
+    lg:static lg:translate-x-0 lg:z-auto lg:w-80 transition-colors duration-300
   ">
     <div class="px-4 py-4 border-b border-gray-800 flex items-center justify-between shrink-0">
       <div class="flex items-center gap-2">
@@ -406,11 +423,11 @@
     </div>
 
     <!-- Cart Footer -->
-    <div class="px-4 py-4 border-t border-gray-800 space-y-3 shrink-0">
-      <div class="flex items-center justify-between text-white">
-        <span class="text-gray-400">Total</span>
-        <span class="text-xl font-black text-white">{formatPrice(cartTotal)}</span>
-      </div>
+      <div class="px-4 py-4 border-t border-gray-200 dark:border-gray-800 gap-3 shrink-0 bg-gray-50 dark:bg-gray-900/50">
+        <div class="flex items-center justify-between text-gray-900 dark:text-white mb-3">
+          <span class="text-gray-500 dark:text-gray-400 font-medium">Total</span>
+          <span class="text-xl font-black text-blue-600 dark:text-blue-400">{formatPrice(cartTotal)}</span>
+        </div>
       <button
         onclick={() => { showCheckout = true; sidebarOpen = false; }}
         disabled={cart.length === 0}
@@ -424,24 +441,24 @@
 
 <!-- Checkout Modal -->
 {#if showCheckout}
-  <div class="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
-    <div class="bg-gray-900 border border-gray-700 rounded-2xl shadow-2xl w-full max-w-md">
-      <div class="px-6 py-5 border-b border-gray-800">
-        <h2 class="font-bold text-white text-lg">Finaliser la vente</h2>
-        <p class="text-gray-500 text-sm">{cartCount} article(s) — {formatPrice(cartTotal)}</p>
+  <div class="fixed inset-0 bg-black/60 dark:bg-black/80 z-50 flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 rounded-2xl shadow-2xl w-full max-w-md transition-colors duration-300">
+      <div class="px-6 py-5 border-b border-gray-100 dark:border-gray-800">
+        <h2 class="font-bold text-gray-900 dark:text-white text-lg">Finaliser la vente</h2>
+        <p class="text-gray-500 dark:text-gray-400 text-sm">{cartCount} article(s) — {formatPrice(cartTotal)}</p>
       </div>
       <div class="p-6 space-y-4">
         <div>
-          <label class="block text-sm font-medium text-gray-400 mb-1">Caisse</label>
-          <select bind:value={selectedPosId} class="w-full bg-gray-800 text-white border border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+          <label for="checkout-pos" class="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Caisse</label>
+          <select id="checkout-pos" bind:value={selectedPosId} class="w-full bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors">
             {#each posInstances as pos}
               <option value={pos.id}>{pos.name}</option>
             {/each}
           </select>
         </div>
         <div>
-          <label class="block text-sm font-medium text-gray-400 mb-1">Client (optionnel)</label>
-          <select bind:value={selectedClientId} class="w-full bg-gray-800 text-white border border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+          <label for="checkout-client" class="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Client (optionnel)</label>
+          <select id="checkout-client" bind:value={selectedClientId} class="w-full bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors">
             <option value="">— Client anonyme —</option>
             {#each clients as c}
               <option value={c.id}>{c.name}</option>
@@ -449,24 +466,25 @@
           </select>
         </div>
         <div>
-          <label class="block text-sm font-medium text-gray-400 mb-2">Mode de paiement</label>
+          <p class="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">Mode de paiement</p>
           <div class="grid grid-cols-3 gap-2">
             {#each Object.entries(paymentLabels) as [key, label]}
               <button
+                type="button"
                 onclick={() => paymentMethod = key}
                 class="py-2 rounded-lg text-sm font-medium border transition-all
-                  {paymentMethod === key ? 'bg-blue-600 border-blue-600 text-white' : 'bg-gray-800 border-gray-700 text-gray-400 hover:border-gray-500'}"
+                  {paymentMethod === key ? 'bg-blue-600 border-blue-600 text-white shadow-lg shadow-blue-600/30' : 'bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 hover:border-blue-500 dark:hover:border-blue-500'}"
               >{label}</button>
             {/each}
           </div>
         </div>
         <div>
-          <label class="block text-sm font-medium text-gray-400 mb-1">Note (optionnel)</label>
-          <textarea bind:value={note} rows="2" class="w-full bg-gray-800 text-white border border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none" placeholder="Remarque sur la commande..."></textarea>
+          <label for="checkout-note" class="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Note (optionnel)</label>
+          <textarea id="checkout-note" bind:value={note} rows="2" class="w-full bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none transition-colors" placeholder="Remarque sur la commande..."></textarea>
         </div>
       </div>
-      <div class="px-6 py-4 border-t border-gray-800 flex gap-3 justify-end">
-        <button onclick={() => showCheckout = false} class="px-4 py-2 text-sm text-gray-400 hover:text-white transition-colors">Annuler</button>
+      <div class="px-6 py-4 border-t border-gray-100 dark:border-gray-800 flex gap-3 justify-end">
+        <button onclick={() => showCheckout = false} class="px-4 py-2 text-sm text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">Annuler</button>
         <button onclick={checkout} disabled={loading || !selectedPosId} class="bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white font-bold px-6 py-2 rounded-xl text-sm transition-colors">
           {loading ? 'Traitement...' : `Valider — ${formatPrice(cartTotal)}`}
         </button>
@@ -478,9 +496,9 @@
 <!-- Invoice Modal -->
 {#if invoiceData}
   <div 
-    class="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4 overflow-y-auto" 
+    class="fixed inset-0 bg-black/80 dark:bg-black/90 z-50 flex items-center justify-center p-4 overflow-y-auto transition-colors duration-300" 
   >
-    <div class="bg-white rounded-xl shadow-2xl w-full max-w-[300px] overflow-hidden" onclick={(e) => e.stopPropagation()}>
+    <div class="bg-white dark:bg-gray-900 rounded-xl shadow-2xl w-full max-w-[300px] overflow-hidden transition-colors duration-300" onclick={(e) => e.stopPropagation()}>
       <!-- Modal Header (Controls) -->
       <div class="bg-gray-100 px-4 py-3 flex items-center justify-between border-b print:hidden">
         <span class="text-xs font-bold text-gray-500 uppercase tracking-wider">Aperçu du ticket</span>
@@ -574,7 +592,7 @@
         </div>
       </div>
 
-      <div class="p-4 border-t bg-gray-50 flex justify-end print:hidden">
+      <div class="p-4 border-t border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-900/50 flex justify-end print:hidden transition-colors duration-300">
         <button 
           type="button"
           onclick={() => invoiceData = null} 

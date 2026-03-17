@@ -1,4 +1,4 @@
-# ShopPOS — Point de Vente
+# Shop — Point de Vente
 
 Un système de **point de vente moderne** inspiré du module POS d'Odoo, conçu pour la gestion d'une petite boutique. Développé avec **SvelteKit**, **Tailwind CSS** et une base de données **SQLite**.
 
