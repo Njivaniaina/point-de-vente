@@ -17,5 +17,31 @@ export const load: PageServerLoad = () => {
     ORDER BY s.created_at DESC LIMIT 5
   `).all();
 
-  return { productCount, clientCount, posCount, todaySales, todayRevenue, totalRevenue, recentSales };
+  const lowStockProducts = db.prepare(`
+    SELECT p.*, c.name as category_name
+    FROM products p
+    LEFT JOIN categories c ON p.category_id = c.id
+    WHERE p.active = 1 AND p.stock < 5
+    ORDER BY p.stock ASC
+  `).all();
+
+  const salesByDay = db.prepare(`
+    SELECT date(created_at) as day, SUM(total_amount) as total
+    FROM sales
+    WHERE created_at >= date('now', '-7 days')
+    GROUP BY day
+    ORDER BY day ASC
+  `).all();
+  
+  return { 
+    productCount, 
+    clientCount, 
+    posCount, 
+    todaySales, 
+    todayRevenue, 
+    totalRevenue, 
+    recentSales, 
+    lowStockProducts,
+    salesTrend: salesByDay 
+  };
 };

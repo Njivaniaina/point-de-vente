@@ -57,6 +57,46 @@
     {/each}
   </div>
 
+  <!-- Sales Trend Chart -->
+  <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-6 transition-colors duration-300">
+    <div class="flex items-center justify-between mb-6">
+      <h2 class="font-semibold text-gray-900 dark:text-white">Tendance des ventes (7 derniers jours)</h2>
+      <div class="flex items-center gap-2 text-xs text-gray-500">
+        <span class="w-3 h-3 bg-blue-600 rounded-full"></span> Ventes (Ar)
+      </div>
+    </div>
+    
+    <div class="h-48 w-full relative">
+      {#if data.salesTrend.length > 1}
+        {@const max = Math.max(...data.salesTrend.map((d: any) => d.total), 1000)}
+        {@const points = data.salesTrend.map((d: any, i: number) => ({
+          x: (i * (700 / (data.salesTrend.length - 1))),
+          y: 200 - (d.total / max * 180) - 10
+        }))}
+        {@const pathData = points.map((p: any, i: number) => (i === 0 ? `M ${p.x} ${p.y}` : `L ${p.x} ${p.y}`)).join(' ')}
+        {@const areaData = `${pathData} L ${points[points.length-1].x} 200 L 0 200 Z`}
+
+        <svg class="w-full h-full" viewBox="0 0 700 200" preserveAspectRatio="none">
+          <path d={pathData} class="stroke-blue-600" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+          
+          {#each points as p, i}
+            <circle cx={p.x} cy={p.y} r="4" class="fill-blue-600 stroke-white dark:stroke-gray-800" stroke-width="2" />
+          {/each}
+        </svg>
+        
+        <div class="flex justify-between mt-2">
+          {#each data.salesTrend as d}
+            <span class="text-[10px] text-gray-400 font-medium">{new Date(d.day).toLocaleDateString('fr-FR', { weekday: 'short' })}</span>
+          {/each}
+        </div>
+      {:else}
+        <div class="absolute inset-0 flex items-center justify-center text-gray-400 text-sm italic">
+          Pas assez de données pour afficher la tendance
+        </div>
+      {/if}
+    </div>
+  </div>
+
   <div class="grid lg:grid-cols-2 gap-6">
     <!-- Recent Sales -->
     <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden transition-colors duration-300">
@@ -107,4 +147,39 @@
       </div>
     </div>
   </div>
+
+  {#if data.lowStockProducts.length > 0}
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-red-100 dark:border-red-900/30 overflow-hidden transition-colors duration-300">
+      <div class="px-6 py-4 border-b border-red-50 dark:border-red-900/20 bg-red-50/50 dark:bg-red-900/10 flex items-center gap-2">
+        <svg class="w-5 h-5 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+        </svg>
+        <h2 class="font-bold text-red-900 dark:text-red-400">Alerte Stocks Faibles</h2>
+      </div>
+      <div class="p-0 overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead class="bg-gray-50/50 dark:bg-gray-900/30 border-b dark:border-gray-700">
+            <tr>
+              <th class="px-6 py-3 text-left font-semibold text-gray-600 dark:text-gray-400">Produit</th>
+              <th class="px-6 py-3 text-left font-semibold text-gray-600 dark:text-gray-400">Catégorie</th>
+              <th class="px-6 py-3 text-right font-semibold text-gray-600 dark:text-gray-400">Stock</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-100 dark:divide-gray-700">
+            {#each data.lowStockProducts as product}
+              <tr class="hover:bg-red-50/30 dark:hover:bg-red-900/5 transition-colors">
+                <td class="px-6 py-3 font-medium text-gray-900 dark:text-white">{product.name}</td>
+                <td class="px-6 py-3 text-gray-500 dark:text-gray-400">{product.category_name ?? '—'}</td>
+                <td class="px-6 py-3 text-right">
+                  <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-400">
+                    {product.stock} restants
+                  </span>
+                </td>
+              </tr>
+            {/each}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  {/if}
 </div>

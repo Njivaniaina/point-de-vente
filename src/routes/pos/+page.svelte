@@ -1,6 +1,7 @@
 <script lang="ts">
   import type { PageData } from './$types.js';
   import { theme, toggleTheme } from '$lib/theme';
+  import QRCode from 'qrcode';
 
   let { data } = $props() as any;
 
@@ -23,6 +24,8 @@
   let loading = $state(false);
   let showCheckout = $state(false);
   let invoiceData = $state<any>(null);
+  let qrCodeUrl = $state<string | null>(null);
+  let showQrCode = $state(false);
   let sidebarOpen = $state(false);
 
   // Watch for client selection or payment method change to auto-fill card number
@@ -147,6 +150,25 @@
       cart = [];
       showCheckout = false;
       
+      if (showQrCode && result.sale?.invoice_ref) {
+        try {
+          const detail = result.items.map((i: any) => `${i.product_name} x${i.quantity}`).join('\n');
+          const qrText = `REF: ${result.sale.invoice_ref}\nTOTAL: ${formatPrice(result.sale.total_amount)}\n\nPRODUITS:\n${detail}` + 
+                        (result.sale.note ? `\n\nNOTE: ${result.sale.note}` : '') + 
+                        (result.sale.card_number ? `\n\nCARTE: ${result.sale.card_number}` : '');
+          
+          qrCodeUrl = await QRCode.toDataURL(qrText, {
+            margin: 1,
+            width: 256
+          });
+        } catch (err) {
+          console.error("QR Code Error:", err);
+          qrCodeUrl = null;
+        }
+      } else {
+        qrCodeUrl = null;
+      }
+
       // Add a tiny delay before showing the invoice to prevent click-through
       setTimeout(() => {
         invoiceData = result;
@@ -464,6 +486,11 @@
           </div>
         </div>
 
+        <div class="flex items-center gap-2 pt-2 border-t border-gray-100 dark:border-gray-700/50">
+          <input type="checkbox" id="show-qr" bind:checked={showQrCode} class="w-4 h-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500" />
+          <label for="show-qr" class="text-xs text-gray-600 dark:text-gray-400 font-medium cursor-pointer">Inclure QR Code sur ticket</label>
+        </div>
+
         {#if paymentMethod === 'card'}
           <div class="animate-in fade-in slide-in-from-top-2 duration-300">
             <label for="checkout-card" class="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">
@@ -502,7 +529,7 @@
   <div 
     class="fixed inset-0 bg-black/80 dark:bg-black/90 z-50 flex items-center justify-center p-4 overflow-y-auto transition-colors duration-300" 
   >
-    <div class="bg-white dark:bg-gray-900 rounded-xl shadow-2xl w-full max-w-[300px] overflow-hidden transition-colors duration-300" onclick={(e) => e.stopPropagation()}>
+    <div class="bg-white dark:bg-gray-900 rounded-xl shadow-2xl w-full max-w-[350px] overflow-hidden transition-colors duration-300" onclick={(e) => e.stopPropagation()}>
       <!-- Modal Header (Controls) -->
       <div class="bg-gray-100 px-4 py-3 flex items-center justify-between border-b print:hidden">
         <span class="text-xs font-bold text-gray-500 uppercase tracking-wider">Aperçu du ticket</span>
@@ -519,7 +546,8 @@
       </div>
 
       <!-- Thermal Ticket Body -->
-      <div id="thermal-ticket" style="background-color: #ffffff; color: #000000; padding: 24px; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace; font-size: 13px; line-height: 1.25;" class="print:p-0">
+      <div class="overflow-y-auto max-h-[65vh] overscroll-contain border-b border-gray-100 dark:border-gray-800">
+        <div id="thermal-ticket" style="background-color: #ffffff; color: #000000; padding: 24px; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace; font-size: 13px; line-height: 1.25;" class="print:p-0">
         <div style="text-align: center; margin-bottom: 24px;">
           <h2 style="font-weight: 900; font-size: 20px; text-transform: uppercase; font-style: italic; margin: 0;">{data.settings.shop_name}</h2>
           <p style="font-size: 12px; margin: 4px 0 0 0;">{data.settings.shop_address}</p>
@@ -578,13 +606,20 @@
           <span style="font-size: 18px; font-weight: 900;">{formatPrice(invoiceData.sale.total_amount)}</span>
         </div>
 
+        {#if qrCodeUrl}
+          <div style="text-align: center; margin-bottom: 16px;">
+            <img src={qrCodeUrl} alt="QR Code Facture" style="width: 100px; height: 100px; margin: 0 auto; display: block;" />
+          </div>
+        {/if}
+
         <div style="text-align: center; font-weight: bold; font-style: italic;">
           <p style="margin: 0;">MERCI DE VOTRE VISITE !</p>
           <p style="font-size: 10px; text-transform: uppercase; font-weight: normal; color: #6b7280; margin: 4px 0 0 0;">A conserver - Ticket client</p>
         </div>
       </div>
+    </div>
 
-      <div class="p-4 border-t border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-900/50 flex justify-end print:hidden transition-colors duration-300">
+    <div class="p-4 border-t border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-900/50 flex justify-end print:hidden transition-colors duration-300">
         <button 
           type="button"
           onclick={() => invoiceData = null} 

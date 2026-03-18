@@ -1,11 +1,13 @@
 <script lang="ts">
   import type { PageData } from './$types.js';
+  import QRCode from 'qrcode';
 
   let { data } = $props() as any;
   let sales = $state(data.sales as any[]);
   let search = $state('');
   let selectedSale = $state<any>(null);
   let saleItems = $state<any[]>([]);
+  let qrCodeUrl = $state<string | null>(null);
 
   let filtered = $derived(sales.filter((s: any) =>
     s.invoice_ref.toLowerCase().includes(search.toLowerCase()) ||
@@ -19,6 +21,21 @@
     const data = await res.json();
     selectedSale = data.sale;
     saleItems = data.items;
+
+    // Generate QR Code for the ticket
+    if (selectedSale.invoice_ref) {
+      try {
+        const detail = saleItems.map((i: any) => `${i.product_name} x${i.quantity}`).join('\n');
+        const qrText = `REF: ${selectedSale.invoice_ref}\nTOTAL: ${formatPrice(selectedSale.total_amount, selectedSale)}\n\nPRODUITS:\n${detail}` + 
+                      (selectedSale.note ? `\n\nNOTE: ${selectedSale.note}` : '') + 
+                      (selectedSale.card_number ? `\n\nCARTE: ${selectedSale.card_number}` : '');
+        
+        qrCodeUrl = await QRCode.toDataURL(qrText, { margin: 1, width: 256 });
+      } catch (err) {
+        console.error(err);
+        qrCodeUrl = null;
+      }
+    }
   }
 
   function downloadInvoice(data: { sale: any, items: any[], settings: any }) {
@@ -154,7 +171,7 @@
   <div 
     class="fixed inset-0 bg-black/80 dark:bg-black/90 z-50 flex items-center justify-center p-4 overflow-y-auto transition-colors duration-300" 
   >
-    <div class="bg-white dark:bg-gray-900 border dark:border-gray-800 rounded-xl shadow-2xl w-full max-w-[300px] overflow-hidden transition-colors duration-300" onclick={(e) => e.stopPropagation()}>
+    <div class="bg-white dark:bg-gray-900 border dark:border-gray-800 rounded-xl shadow-2xl w-full max-w-[350px] overflow-hidden transition-colors duration-300" onclick={(e) => e.stopPropagation()}>
       <!-- Modal Header (Controls) -->
       <div class="bg-gray-100 dark:bg-gray-800 px-4 py-3 flex items-center justify-between border-b dark:border-gray-700 print:hidden transition-colors">
         <span class="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Aperçu du ticket</span>
@@ -171,7 +188,8 @@
       </div>
 
       <!-- Thermal Ticket Body -->
-      <div id="thermal-ticket" style="background-color: #ffffff; color: #000000; padding: 24px; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace; font-size: 13px; line-height: 1.25;" class="print:p-0">
+      <div class="overflow-y-auto max-h-[65vh] overscroll-contain border-b border-gray-100 dark:border-gray-700 bg-white">
+        <div id="thermal-ticket" style="background-color: #ffffff; color: #000000; padding: 24px; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace; font-size: 13px; line-height: 1.25;" class="print:p-0">
         <div style="text-align: center; margin-bottom: 24px;">
           <h2 style="font-weight: 900; font-size: 20px; text-transform: uppercase; font-style: italic; margin: 0;">{data.settings.shop_name}</h2>
           <p style="font-size: 12px; margin: 4px 0 0 0;">{data.settings.shop_address}</p>
@@ -234,7 +252,14 @@
           <p style="margin: 0;">MERCI DE VOTRE VISITE !</p>
           <p style="font-size: 10px; text-transform: uppercase; font-weight: normal; color: #6b7280; margin: 4px 0 0 0;">A conserver - Ticket client</p>
         </div>
+
+        {#if qrCodeUrl}
+          <div style="text-align: center; margin-top: 16px;">
+            <img src={qrCodeUrl} alt="QR Code" style="width: 100px; height: 100px; margin: 0 auto; display: block;" />
+          </div>
+        {/if}
       </div>
+    </div>
 
       <div class="p-4 border-t border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-900/50 flex justify-end print:hidden transition-colors duration-300">
         <button 
