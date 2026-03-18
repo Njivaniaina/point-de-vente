@@ -61,6 +61,19 @@ La base de données SQLite est créée automatiquement dans `data/pos.db` au pre
 
 ---
 
+## 🔐 Sécurité
+
+L'accès à l'espace administration (`/admin`) est protégé par une authentification par cookie de session.
+
+### Identifiants par défaut
+- **Utilisateur** : `admin`
+- **Mot de passe** : `admin`
+
+> [!IMPORTANT]
+> Pour des raisons de sécurité, veuillez changer ces identifiants dès votre première connexion dans l'onglet **Paramètres** de l'administration.
+
+---
+
 ## 🏗️ Structure du projet
 
 ```

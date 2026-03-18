@@ -66,6 +66,36 @@
     }
     loading = false;
   }
+
+  let adminUsername = $state(data.user?.username || '');
+  let adminPassword = $state('');
+  let profileLoading = $state(false);
+  let profileSuccess = $state(false);
+
+  async function updateProfile() {
+    profileLoading = true;
+    profileSuccess = false;
+    try {
+      const res = await fetch('/api/user', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username: adminUsername, password: adminPassword })
+      });
+      
+      if (res.ok) {
+        profileSuccess = true;
+        adminPassword = '';
+        setTimeout(() => profileSuccess = false, 3000);
+      } else {
+        const data = await res.json();
+        alert(data.error || "Erreur de mise à jour");
+      }
+    } catch (err) {
+      alert("Erreur réseau");
+    } finally {
+      profileLoading = false;
+    }
+  }
 </script>
 
 <div class="max-w-2xl mx-auto space-y-6">
@@ -174,6 +204,63 @@
           <span class="animate-spin text-sm">⌛</span>
         {/if}
         Enregistrer les modifications
+      </button>
+    </div>
+  </div>
+
+  <!-- Admin Profile Settings -->
+  <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 shadow-sm p-6 space-y-4 transition-colors duration-300">
+    <div class="flex items-center gap-2 mb-2">
+      <div class="p-2 bg-blue-50 dark:bg-blue-900/20 text-blue-600 rounded-lg">
+        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
+      </div>
+      <h2 class="text-xl font-bold text-gray-900 dark:text-white">Profil Administrateur</h2>
+    </div>
+    
+    <p class="text-sm text-gray-500 mb-4">Modifiez vos identifiants de connexion à l'espace administration.</p>
+
+    <div class="space-y-4">
+      <div>
+        <label for="admin_user" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Nom d'utilisateur</label>
+        <input 
+          id="admin_user"
+          bind:value={adminUsername} 
+          type="text" 
+          class="w-full px-4 py-2 bg-gray-50 dark:bg-gray-900/50 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm transition-colors"
+        />
+      </div>
+
+      <div>
+        <label for="admin_pass" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Nouveau mot de passe (laisser vide pour ne pas changer)</label>
+        <input 
+          id="admin_pass"
+          bind:value={adminPassword} 
+          type="password" 
+          placeholder="••••••••"
+          class="w-full px-4 py-2 bg-gray-50 dark:bg-gray-900/50 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm transition-colors"
+        />
+      </div>
+    </div>
+
+    <div class="pt-4 border-t dark:border-gray-700 flex items-center justify-between transition-colors">
+      {#if profileSuccess}
+        <p class="text-green-600 text-sm font-medium flex items-center gap-1">
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+          Profil mis à jour !
+        </p>
+      {:else}
+        <div></div>
+      {/if}
+      
+      <button 
+        onclick={updateProfile}
+        disabled={profileLoading}
+        class="bg-gray-800 hover:bg-black text-white font-bold px-6 py-2 rounded-lg text-sm transition-all shadow-md flex items-center gap-2"
+      >
+        {#if profileLoading}
+          <span class="animate-spin text-sm">⌛</span>
+        {/if}
+        Mettre à jour le profil
       </button>
     </div>
   </div>

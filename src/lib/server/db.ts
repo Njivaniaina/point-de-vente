@@ -106,6 +106,13 @@ function initSchema(db: Database.Database) {
       key TEXT PRIMARY KEY,
       value TEXT
     );
+
+    CREATE TABLE IF NOT EXISTS users (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      username TEXT UNIQUE NOT NULL,
+      password_hash TEXT NOT NULL,
+      created_at TEXT NOT NULL DEFAULT (datetime('now'))
+    );
   `);
 
 	// Seed default data if empty
@@ -128,4 +135,16 @@ function initSchema(db: Database.Database) {
   if (settingsCount === 0) {
     db.prepare("INSERT INTO settings (key, value) VALUES ('shop_name', 'SHOP POS'), ('shop_address', 'Antananarivo, Madagascar'), ('shop_phone', '+261 34 00 000 00'), ('currency', 'MGA'), ('usd_rate', '4000'), ('eur_rate', '4500'), ('tax_rate', '20')").run();
   }
+
+  const usersCount = (db.prepare('SELECT COUNT(*) as count FROM users').get() as { count: number }).count;
+  if (usersCount === 0) {
+    // Default password 'admin' hashed with SHA-256
+    const defaultHash = '8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918';
+    db.prepare("INSERT INTO users (username, password_hash) VALUES ('admin', ?)").run(defaultHash);
+  }
+}
+
+import crypto from 'crypto';
+export function hashPassword(password: string): string {
+  return crypto.createHash('sha256').update(password).digest('hex');
 }
