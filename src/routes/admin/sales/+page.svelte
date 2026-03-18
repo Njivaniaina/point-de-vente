@@ -6,7 +6,6 @@
   let search = $state('');
   let selectedSale = $state<any>(null);
   let saleItems = $state<any[]>([]);
-  let loadingPDF = $state(false);
 
   let filtered = $derived(sales.filter((s: any) =>
     s.invoice_ref.toLowerCase().includes(search.toLowerCase()) ||
@@ -49,35 +48,6 @@
     URL.revokeObjectURL(url);
   }
 
-  async function exportToPDF(invoiceRef: string) {
-    const element = document.getElementById('thermal-ticket');
-    if (!element) return;
-    
-    // @ts-ignore
-    const html2pdf = window.html2pdf;
-    if (!html2pdf) {
-      alert("Erreur: Le module PDF n'est pas chargé. Veuillez patienter ou actualiser la page.");
-      return;
-    }
-
-    loadingPDF = true;
-    const opt = {
-      margin:       5,
-      filename:     `ticket_${invoiceRef}.pdf`,
-      image:        { type: 'jpeg', quality: 0.98 },
-      html2canvas:  { scale: 2, useCORS: true, logging: false, letterRendering: true },
-      jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
-    };
-
-    try {
-      await html2pdf().from(element).set(opt).save();
-    } catch (err) {
-      console.error("PDF Error:", err);
-      alert("Erreur lors de la génération du PDF.");
-    } finally {
-      loadingPDF = false;
-    }
-  }
 
   const paymentLabels: Record<string, string> = { cash: 'Espèces', card: 'Carte' };
 
@@ -129,7 +99,6 @@
 
 <svelte:head>
   <title>Ventes — {data.settings.shop_name || 'ShopPOS'}</title>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 </svelte:head>
 
 <div class="space-y-6">
@@ -192,20 +161,8 @@
         <div class="flex gap-2">
           <button 
             type="button"
-            onclick={() => exportToPDF(selectedSale.invoice_ref)} 
-            disabled={loadingPDF}
-            class="bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white text-[10px] font-bold px-2 py-1 rounded transition-colors flex items-center gap-1"
-          >
-            {#if loadingPDF}
-              <span class="animate-spin text-[10px]">⌛</span>
-            {/if}
-            PDF
-          </button>
-          <button 
-            type="button"
             onclick={() => window.print()} 
-            disabled={loadingPDF}
-            class="bg-gray-800 hover:bg-gray-950 disabled:opacity-50 text-white text-[10px] font-bold px-2 py-1 rounded transition-colors flex items-center gap-1"
+            class="bg-gray-800 hover:bg-gray-950 text-white text-[10px] font-bold px-2 py-1 rounded transition-colors flex items-center gap-1"
           >
             <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" /></svg>
             PRINT
@@ -283,8 +240,7 @@
         <button 
           type="button"
           onclick={() => selectedSale = null} 
-          disabled={loadingPDF}
-          class="bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white font-bold px-8 py-2 rounded-lg text-xs transition-colors shadow-lg"
+          class="bg-blue-600 hover:bg-blue-700 text-white font-bold px-8 py-2 rounded-lg text-xs transition-colors shadow-lg"
         >
           FERMER
         </button>

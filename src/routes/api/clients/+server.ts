@@ -10,9 +10,9 @@ export const GET: RequestHandler = () => {
 
 export const POST: RequestHandler = async ({ request }) => {
   const db = getDb();
-  const { name, phone, email, address } = await request.json();
+  const { name, phone, email, address, card_number } = await request.json();
   if (!name) return json({ error: 'Name required' }, { status: 400 });
-  const result = db.prepare('INSERT INTO clients (name, phone, email, address) VALUES (?, ?, ?, ?)').run(name, phone || null, email || null, address || null);
+  const result = db.prepare('INSERT INTO clients (name, phone, email, address, card_number) VALUES (?, ?, ?, ?, ?)').run(name, phone || null, email || null, address || null, card_number || null);
   const row = db.prepare('SELECT * FROM clients WHERE id = ?').get(result.lastInsertRowid);
   return json(row, { status: 201 });
 };

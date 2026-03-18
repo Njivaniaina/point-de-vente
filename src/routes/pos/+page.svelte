@@ -24,17 +24,18 @@
   let showCheckout = $state(false);
   let invoiceData = $state<any>(null);
   let sidebarOpen = $state(false);
-  let loadingPDF = $state(false);
 
-  // Watch for client selection to auto-fill card number
+  // Watch for client selection or payment method change to auto-fill card number
   $effect(() => {
-    if (selectedClientId) {
+    if (paymentMethod === 'card' && selectedClientId) {
       const client = clients.find(c => c.id === selectedClientId);
-      if (client && client.card_number && !cardNumber) {
+      if (client?.card_number) {
         cardNumber = client.card_number;
       }
     }
   });
+
+  let cardRequired = $derived(paymentMethod === 'card' && !clients.find(c => c.id === selectedClientId)?.card_number);
 
   const paymentLabels: Record<string, string> = { cash: 'Espèces', card: 'Carte' };
 
@@ -97,6 +98,10 @@
   async function checkout() {
     if (!selectedPosId) return;
     if (cart.length === 0) return;
+    if (cardRequired && !cardNumber.trim()) {
+      alert("Le numéro de carte est obligatoire pour ce mode de paiement.");
+      return;
+    }
     loading = true;
     const items = cart.map(i => ({
       product_id: i.product.id,
@@ -112,7 +117,7 @@
           pos_id: selectedPosId,
           client_id: selectedClientId,
           payment_method: paymentMethod,
-          card_number: paymentMethod === 'card' ? (cardNumber || clients.find(c => c.id === selectedClientId)?.card_number) : null,
+          card_number: paymentMethod === 'card' ? cardNumber : null,
           subtotal: cartSubtotal,
           tax_amount: cartTaxAmount,
           tax_rate: taxRate,
@@ -157,35 +162,6 @@
 
   function printInvoice() { window.print(); }
 
-  async function exportToPDF(invoiceRef: string) {
-    const element = document.getElementById('thermal-ticket');
-    if (!element) return;
-    
-    // @ts-ignore
-    const html2pdf = window.html2pdf;
-    if (!html2pdf) {
-      alert("Erreur: Le module PDF n'est pas chargé. Veuillez patienter ou actualiser la page.");
-      return;
-    }
-
-    loadingPDF = true;
-    const opt = {
-      margin:       5,
-      filename:     `ticket_${invoiceRef}.pdf`,
-      image:        { type: 'jpeg', quality: 0.98 },
-      html2canvas:  { scale: 2, useCORS: true, logging: false, letterRendering: true },
-      jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
-    };
-
-    try {
-      await html2pdf().from(element).set(opt).save();
-    } catch (err) {
-      console.error("PDF Error:", err);
-      alert("Erreur lors de la génération du PDF.");
-    } finally {
-      loadingPDF = false;
-    }
-  }
 
   function downloadInvoice(data: any) {
     const sale = data.sale;
@@ -235,7 +211,6 @@
 <svelte:head>
   <title>Caisse — {data.settings.shop_name || 'ShopPOS'}</title>
   <meta name="description" content="Interface point de vente {data.settings.shop_name || 'ShopPOS'}" />
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 </svelte:head>
 
 <div class="flex h-screen bg-gray-50 dark:bg-gray-950 overflow-hidden text-gray-900 dark:text-gray-100 transition-colors duration-300">
@@ -249,7 +224,7 @@
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-1.5 6h13" />
           </svg>
         </div>
-        <span class="text-white font-bold text-sm hidden sm:block">{data.settings.shop_name || 'ShopPOS'}</span>
+        <span class="text-gray-900 dark:text-white font-bold text-sm hidden sm:block">{data.settings.shop_name || 'ShopPOS'}</span>
       </div>
 
       <!-- Theme Toggle -->
@@ -385,12 +360,12 @@
     {sidebarOpen ? 'translate-x-0' : 'translate-x-full'}
     lg:static lg:translate-x-0 lg:z-auto lg:w-80 transition-colors duration-300
   ">
-    <div class="px-4 py-4 border-b border-gray-800 flex items-center justify-between shrink-0">
+    <div class="px-4 py-4 border-b border-gray-200 dark:border-gray-800 flex items-center justify-between shrink-0">
       <div class="flex items-center gap-2">
         <svg class="w-5 h-5 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-1.5 6h13M9 19a1 1 0 100 2 1 1 0 000-2zm10 0a1 1 0 100 2 1 1 0 000-2z" />
         </svg>
-        <span class="text-white font-semibold">Panier</span>
+        <span class="text-gray-900 dark:text-white font-semibold">Panier</span>
         {#if cartCount > 0}
           <span class="bg-blue-600 text-white text-xs font-bold px-1.5 py-0.5 rounded-full">{cartCount}</span>
         {/if}
@@ -414,15 +389,15 @@
         </div>
       {:else}
         {#each cart as item}
-          <div class="px-4 py-3 border-b border-gray-800 flex items-start gap-3">
+          <div class="px-4 py-3 border-b border-gray-100 dark:border-gray-800 flex items-start gap-3">
             <div class="flex-1 min-w-0">
-              <p class="text-white text-sm font-medium leading-tight line-clamp-1">{item.product.name}</p>
+              <p class="text-gray-900 dark:text-white text-sm font-medium leading-tight line-clamp-1">{item.product.name}</p>
               <p class="text-blue-400 text-xs">{formatPrice(item.product.price)}</p>
             </div>
             <div class="flex items-center gap-1 shrink-0">
-              <button onclick={() => updateQty(item.product.id, -1)} class="w-6 h-6 rounded-md bg-gray-700 hover:bg-gray-600 text-white text-sm flex items-center justify-center transition-colors">−</button>
-              <span class="text-white text-sm font-semibold w-6 text-center">{item.quantity}</span>
-              <button onclick={() => updateQty(item.product.id, +1)} class="w-6 h-6 rounded-md bg-gray-700 hover:bg-gray-600 text-white text-sm flex items-center justify-center transition-colors">+</button>
+              <button onclick={() => updateQty(item.product.id, -1)} class="w-6 h-6 rounded-md bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-900 dark:text-white text-sm flex items-center justify-center transition-colors">−</button>
+              <span class="text-gray-900 dark:text-white text-sm font-semibold w-6 text-center">{item.quantity}</span>
+              <button onclick={() => updateQty(item.product.id, +1)} class="w-6 h-6 rounded-md bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-900 dark:text-white text-sm flex items-center justify-center transition-colors">+</button>
               <button onclick={() => removeFromCart(item.product.id)} class="w-6 h-6 rounded-md hover:bg-red-900/50 text-red-500 text-sm flex items-center justify-center ml-1 transition-colors">
                 <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
               </button>
@@ -488,6 +463,21 @@
             {/each}
           </div>
         </div>
+
+        {#if paymentMethod === 'card'}
+          <div class="animate-in fade-in slide-in-from-top-2 duration-300">
+            <label for="checkout-card" class="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">
+              Numéro de carte {cardRequired ? '*' : '(enregistré)'}
+            </label>
+            <input 
+              id="checkout-card" 
+              bind:value={cardNumber} 
+              placeholder="XXXX XXXX XXXX XXXX" 
+              class="w-full bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors" 
+            />
+          </div>
+        {/if}
+
         <div>
           <label for="checkout-note" class="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Note (optionnel)</label>
           <textarea id="checkout-note" bind:value={note} rows="2" class="w-full bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none transition-colors" placeholder="Remarque sur la commande..."></textarea>
@@ -495,7 +485,11 @@
       </div>
       <div class="px-6 py-4 border-t border-gray-100 dark:border-gray-800 flex gap-3 justify-end">
         <button onclick={() => showCheckout = false} class="px-4 py-2 text-sm text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">Annuler</button>
-        <button onclick={checkout} disabled={loading || !selectedPosId} class="bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white font-bold px-6 py-2 rounded-xl text-sm transition-colors">
+        <button 
+          onclick={checkout} 
+          disabled={loading || !selectedPosId || (cardRequired && !cardNumber.trim())} 
+          class="bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white font-bold px-6 py-2 rounded-xl text-sm transition-colors"
+        >
           {loading ? 'Traitement...' : `Valider — ${formatPrice(cartTotal)}`}
         </button>
       </div>
@@ -515,20 +509,8 @@
         <div class="flex gap-2">
           <button 
             type="button"
-            onclick={() => exportToPDF(invoiceData.sale.invoice_ref)} 
-            disabled={loadingPDF}
-            class="bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white text-[10px] font-bold px-2 py-1 rounded transition-colors flex items-center gap-1"
-          >
-            {#if loadingPDF}
-              <span class="animate-spin text-[10px]">⌛</span>
-            {/if}
-            PDF
-          </button>
-          <button 
-            type="button"
             onclick={printInvoice} 
-            disabled={loadingPDF}
-            class="bg-gray-800 hover:bg-gray-950 disabled:opacity-50 text-white text-[10px] font-bold px-2 py-1 rounded transition-colors flex items-center gap-1"
+            class="bg-gray-800 hover:bg-gray-950 text-white text-[10px] font-bold px-2 py-1 rounded transition-colors flex items-center gap-1"
           >
             <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" /></svg>
             PRINT
@@ -606,8 +588,7 @@
         <button 
           type="button"
           onclick={() => invoiceData = null} 
-          disabled={loadingPDF}
-          class="bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white font-bold px-8 py-2 rounded-lg text-xs transition-colors shadow-lg"
+          class="bg-blue-600 hover:bg-blue-700 text-white font-bold px-8 py-2 rounded-lg text-xs transition-colors shadow-lg"
         >
           TERMINER
         </button>

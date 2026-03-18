@@ -4,8 +4,8 @@ import type { RequestHandler } from './$types.js';
 
 export const PUT: RequestHandler = async ({ request, params }) => {
   const db = getDb();
-  const { name, phone, email, address } = await request.json();
-  db.prepare('UPDATE clients SET name=?, phone=?, email=?, address=? WHERE id=?').run(name, phone || null, email || null, address || null, params.id);
+  const { name, phone, email, address, card_number } = await request.json();
+  db.prepare('UPDATE clients SET name=?, phone=?, email=?, address=?, card_number=? WHERE id=?').run(name, phone || null, email || null, address || null, card_number || null, params.id);
   const row = db.prepare('SELECT * FROM clients WHERE id = ?').get(params.id);
   return json(row);
 };

@@ -2,7 +2,7 @@
 
 Un système de **point de vente moderne** inspiré du module POS d'Odoo, conçu pour la gestion d'une petite boutique. Développé avec **SvelteKit**, **Tailwind CSS** et une base de données **SQLite**.
 
-![ShopPOS](https://img.shields.io/badge/SvelteKit-FF3E00?style=for-the-badge&logo=svelte&logoColor=white)
+![Shop](https://img.shields.io/badge/SvelteKit-FF3E00?style=for-the-badge&logo=svelte&logoColor=white)
 ![SQLite](https://img.shields.io/badge/SQLite-07405E?style=for-the-badge&logo=sqlite&logoColor=white)
 ![TailwindCSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)
 

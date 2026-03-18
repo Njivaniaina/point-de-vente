@@ -33,19 +33,19 @@
 
   <!-- Sidebar -->
   <aside class="
-    fixed inset-y-0 left-0 z-30 w-64 bg-gray-950 flex flex-col
+    fixed inset-y-0 left-0 z-30 w-64 bg-white dark:bg-gray-950 flex flex-col border-r border-gray-200 dark:border-gray-800
     transform transition-transform duration-300 ease-in-out
     {sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
     lg:static lg:translate-x-0 lg:z-auto
   ">
     <!-- Logo -->
-    <div class="flex items-center gap-3 px-6 py-5 border-b border-gray-800">
+    <div class="flex items-center gap-3 px-6 py-5 border-b border-gray-200 dark:border-gray-800">
       <div class="w-9 h-9 bg-blue-600 rounded-lg flex items-center justify-center shadow-lg shadow-blue-600/30 shrink-0">
         <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-1.5 6h13M7 13L5.4 5M9 19a1 1 0 100 2 1 1 0 000-2zm10 0a1 1 0 100 2 1 1 0 000-2z" />
         </svg>
       </div>
-      <span class="text-white font-bold text-lg">{data.settings.shop_name || 'ShopPOS'}</span>
+      <span class="text-gray-900 dark:text-white font-bold text-lg">{data.settings.shop_name || 'ShopPOS'}</span>
     </div>
 
     <!-- Nav -->
@@ -58,7 +58,7 @@
           class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150
             {isActive
               ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/20'
-              : 'text-gray-400 hover:bg-gray-800 hover:text-white'}"
+              : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white'}"
         >
           <svg class="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d={item.icon} />
@@ -69,11 +69,11 @@
     </nav>
 
     <!-- Theme Toggle & Local Return -->
-    <div class="px-3 py-4 border-t border-gray-800 space-y-2">
+    <div class="px-3 py-4 border-t border-gray-200 dark:border-gray-800 space-y-2">
       <button
         onclick={toggleTheme}
         aria-label={$theme === 'light' ? 'Activer le mode sombre' : 'Activer le mode clair'}
-        class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-gray-400 hover:text-white hover:bg-gray-800 transition-all duration-150"
+        class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800 transition-all duration-150"
       >
         {#if $theme === 'light'}
           <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -90,7 +90,7 @@
 
       <a
         href="/"
-        class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-gray-500 hover:text-white hover:bg-gray-800 transition-all duration-150"
+        class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800 transition-all duration-150"
       >
         <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
