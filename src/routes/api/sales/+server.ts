@@ -34,11 +34,11 @@ export const POST: RequestHandler = async ({ request }) => {
     const saleId = saleResult.lastInsertRowid;
 
     const insertItem = db.prepare(
-      'INSERT INTO sale_items (sale_id, product_id, quantity, unit_price, subtotal) VALUES (?, ?, ?, ?, ?)'
+      'INSERT INTO sale_items (sale_id, product_id, quantity, unit, unit_price, subtotal) VALUES (?, ?, ?, ?, ?, ?)'
     );
 
     for (const item of items) {
-      insertItem.run(saleId, item.product_id, item.quantity, item.unit_price, item.quantity * item.unit_price);
+      insertItem.run(saleId, item.product_id, item.quantity, item.unit || null, item.unit_price, item.quantity * item.unit_price);
       // Update stock
       db.prepare('UPDATE products SET stock = stock - ? WHERE id = ?').run(item.quantity, item.product_id);
     }

@@ -5,5 +5,6 @@ export const load: PageServerLoad = () => {
   const db = getDb();
   const rows = db.prepare('SELECT * FROM settings').all() as { key: string, value: string }[];
   const settings = rows.reduce((acc, row) => ({ ...acc, [row.key]: row.value }), {});
-  return { settings };
+  const currencies = db.prepare('SELECT * FROM currencies WHERE active = 1').all();
+  return { settings, currencies };
 };

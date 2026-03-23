@@ -71,12 +71,12 @@
   );
 
   function openNew() {
-    editTarget = { name: '', price: 0, stock: 0, barcode: '', image_url: '/default-product.png', category_id: '' };
+    editTarget = { name: '', price: 0, stock: 0, unit: 'unité', barcode: '', image_url: '/default-product.png', category_id: '', original_price: 0, price_currency: data.settings.currency || 'MGA' };
     showModal = true; error = '';
   }
 
   function openEdit(p: any) {
-    editTarget = { ...p, category_id: p.category_id ?? '', image_url: p.image_url || '/default-product.png' };
+    editTarget = { ...p, category_id: p.category_id ?? '', image_url: p.image_url || '/default-product.png', original_price: p.original_price ?? p.price, price_currency: p.price_currency || 'MGA' };
     showModal = true; error = '';
   }
 
@@ -109,16 +109,32 @@
   }));
 
   function formatPrice(amount: number) {
-    const currency = data.settings.currency || 'MGA';
-    if (currency === 'MGA') {
+    const curCode = data.settings.currency || 'MGA';
+    const currency = data.currencies.find((c: any) => c.code === curCode) || { code: 'MGA', symbol: 'Ar', exchange_rate: 1 };
+    
+    if (currency.code === 'MGA') {
       return new Intl.NumberFormat('fr-MG').format(amount) + ' Ar';
     }
-    const rate = parseFloat(data.settings[currency.toLowerCase() + '_rate'] || '1');
-    const converted = amount / (rate || 1);
-    return currencyFormat.format(converted);
+    
+    const converted = amount / (currency.exchange_rate || 1);
+    return new Intl.NumberFormat('fr-FR', {
+      style: 'currency',
+      currency: currency.code,
+      currencyDisplay: 'symbol'
+    }).format(converted);
   }
 
   let currentCurrencyLabel = $derived(data.settings.currency || 'MGA');
+
+  // Multi-currency price conversion in form
+  $effect(() => {
+    if (!showModal || !editTarget) return;
+    const currency = data.currencies.find((c: any) => c.code === editTarget.price_currency) || { exchange_rate: 1 };
+    // MGA Price = original_price * rate (since rate is 1 Ar = X cur, it should be original_price / rate)
+    // Wait, my rate is 1 BASE (MGA) = X EUR.
+    // So if 1 MGA = 0.0002 EUR, then 10 EUR = 10 / 0.0002 = 50,000 MGA.
+    editTarget.price = (editTarget.original_price || 0) / (currency.exchange_rate || 1);
+  });
 </script>
 
 <svelte:head>
@@ -186,6 +202,7 @@
               <td class="px-4 py-3 text-right font-semibold text-gray-900 dark:text-white whitespace-nowrap">{formatPrice(prod.price)}</td>
               <td class="px-4 py-3 text-right hidden md:table-cell">
                 <span class="font-medium {prod.stock < 5 ? 'text-red-600 dark:text-red-400' : prod.stock < 20 ? 'text-amber-600 dark:text-amber-400' : 'text-emerald-600 dark:text-emerald-400'}">{prod.stock}</span>
+                <span class="text-[10px] text-gray-400 uppercase font-bold ml-1">{prod.unit || 'unité'}</span>
               </td>
               <td class="px-4 py-3 text-right">
                 <div class="flex gap-1 justify-end">
@@ -220,13 +237,45 @@
             <label for="prod-name" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Nom *</label>
             <input id="prod-name" bind:value={editTarget.name} class="w-full bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-300 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors" placeholder="Ex: Téléphone Itel" />
           </div>
-          <div>
-            <label for="prod-price" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Prix ({currentCurrencyLabel})</label>
-            <input type="number" id="prod-price" bind:value={editTarget.price} min="0" class="w-full bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-300 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors" />
+          <div class="sm:col-span-2 grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div class="sm:col-span-2">
+              <label for="prod-price" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Prix de base</label>
+              <div class="relative">
+                <input type="number" id="prod-price" bind:value={editTarget.original_price} min="0" step="0.01" class="w-full bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-300 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors" />
+                <div class="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-bold text-gray-400 bg-white dark:bg-gray-900 px-1">
+                  ≈ {new Intl.NumberFormat('fr-MG').format(Math.round(editTarget.price))} Ar
+                </div>
+              </div>
+            </div>
+            <div>
+              <label for="prod-currency" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Devise</label>
+              <select id="prod-currency" bind:value={editTarget.price_currency} class="w-full bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-300 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors">
+                {#each data.currencies as cur}
+                  <option value={cur.code}>{cur.code} ({cur.symbol})</option>
+                {/each}
+              </select>
+            </div>
           </div>
           <div>
             <label for="prod-stock" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Stock</label>
             <input type="number" id="prod-stock" bind:value={editTarget.stock} min="0" class="w-full bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-300 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors" />
+          </div>
+          <div>
+            <label for="prod-unit" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Unité</label>
+            <select id="prod-unit" bind:value={editTarget.unit} class="w-full bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-300 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors">
+              <optgroup label="Volume / Masse">
+                <option value="kg">Kilogramme (Kg)</option>
+                <option value="g">Gramme (g)</option>
+                <option value="l">Litre (L)</option>
+                <option value="ml">Millilitre (ml)</option>
+              </optgroup>
+              <optgroup label="Emballage">
+                <option value="unité">Unité</option>
+                <option value="paquet">Paquet</option>
+                <option value="boite">Boîte</option>
+                <option value="sac">Sac</option>
+              </optgroup>
+            </select>
           </div>
           <div>
             <label for="prod-category" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Catégorie</label>

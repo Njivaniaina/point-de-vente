@@ -41,6 +41,9 @@ function initSchema(db: Database.Database) {
       name TEXT NOT NULL,
       price REAL NOT NULL DEFAULT 0,
       stock INTEGER NOT NULL DEFAULT 0,
+      unit TEXT DEFAULT 'unité',
+      original_price REAL,
+      price_currency TEXT DEFAULT 'MGA',
       barcode TEXT,
       image_url TEXT,
       category_id INTEGER REFERENCES categories(id) ON DELETE SET NULL,
@@ -74,7 +77,24 @@ function initSchema(db: Database.Database) {
       note TEXT,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP
     );
+
+    CREATE TABLE IF NOT EXISTS currencies (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      code TEXT UNIQUE NOT NULL,
+      name TEXT NOT NULL,
+      symbol TEXT NOT NULL,
+      exchange_rate REAL NOT NULL DEFAULT 1,
+      active INTEGER NOT NULL DEFAULT 1,
+      is_default INTEGER NOT NULL DEFAULT 0
+    );
   `);
+
+  // Migrations for products table
+  const productsCols = db.prepare("PRAGMA table_info(products)").all() as any[];
+  const productsColNames = productsCols.map(c => c.name);
+  if (!productsColNames.includes('unit')) db.exec("ALTER TABLE products ADD COLUMN unit TEXT DEFAULT 'unité'");
+  if (!productsColNames.includes('original_price')) db.exec("ALTER TABLE products ADD COLUMN original_price REAL");
+  if (!productsColNames.includes('price_currency')) db.exec("ALTER TABLE products ADD COLUMN price_currency TEXT DEFAULT 'MGA'");
 
   // Migrations for sales table
   const salesCols = db.prepare("PRAGMA table_info(sales)").all() as any[];
@@ -92,12 +112,18 @@ function initSchema(db: Database.Database) {
   const clientsColNames = clientsCols.map(c => c.name);
   if (!clientsColNames.includes('card_number')) db.exec("ALTER TABLE clients ADD COLUMN card_number TEXT");
 
+  // Migrations for sale_items table
+  const itemCols = db.prepare("PRAGMA table_info(sale_items)").all() as any[];
+  const itemColNames = itemCols.map(c => c.name);
+  if (!itemColNames.includes('unit')) db.exec("ALTER TABLE sale_items ADD COLUMN unit TEXT");
+
   db.exec(`
     CREATE TABLE IF NOT EXISTS sale_items (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       sale_id INTEGER NOT NULL REFERENCES sales(id) ON DELETE CASCADE,
       product_id INTEGER NOT NULL REFERENCES products(id),
       quantity INTEGER NOT NULL DEFAULT 1,
+      unit TEXT,
       unit_price REAL NOT NULL DEFAULT 0,
       subtotal REAL NOT NULL DEFAULT 0
     );
@@ -133,7 +159,15 @@ function initSchema(db: Database.Database) {
 
   const settingsCount = (db.prepare('SELECT COUNT(*) as count FROM settings').get() as { count: number }).count;
   if (settingsCount === 0) {
-    db.prepare("INSERT INTO settings (key, value) VALUES ('shop_name', 'SHOP POS'), ('shop_address', 'Antananarivo, Madagascar'), ('shop_phone', '+261 34 00 000 00'), ('currency', 'MGA'), ('usd_rate', '4000'), ('eur_rate', '4500'), ('tax_rate', '20')").run();
+    db.prepare("INSERT INTO settings (key, value) VALUES ('shop_name', 'SHOP POS'), ('shop_address', 'Antananarivo, Madagascar'), ('shop_phone', '+261 34 00 000 00'), ('currency', 'MGA'), ('tax_rate', '20')").run();
+  }
+
+  const currenciesCount = (db.prepare('SELECT COUNT(*) as count FROM currencies').get() as { count: number }).count;
+  if (currenciesCount === 0) {
+    db.prepare("INSERT INTO currencies (code, name, symbol, exchange_rate, is_default) VALUES ('MGA', 'Ariary Malgache', 'Ar', 1, 1)").run();
+    db.prepare("INSERT INTO currencies (code, name, symbol, exchange_rate) VALUES ('USD', 'Dollar US', '$', 4000)").run();
+    db.prepare("INSERT INTO currencies (code, name, symbol, exchange_rate) VALUES ('EUR', 'Euro', '€', 4500)").run();
+    db.prepare("INSERT INTO currencies (code, name, symbol, exchange_rate) VALUES ('JPY', 'Yen Japonais', '¥', 30)").run();
   }
 
   const usersCount = (db.prepare('SELECT COUNT(*) as count FROM users').get() as { count: number }).count;

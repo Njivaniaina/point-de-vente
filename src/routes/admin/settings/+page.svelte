@@ -10,6 +10,7 @@
 
   // Load images on mount
   import { onMount } from 'svelte';
+  import { invalidateAll } from '$app/navigation';
   onMount(() => {
     loadImages();
   });
@@ -62,6 +63,7 @@
     
     if (res.ok) {
       success = true;
+      await invalidateAll();
       setTimeout(() => success = false, 3000);
     }
     loading = false;
@@ -140,37 +142,16 @@
       </div>
 
       <div>
-        <label for="currency" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Devise par défaut</label>
+        <label for="currency" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Devise d'affichage par défaut</label>
         <select 
           id="currency"
           bind:value={settings.currency} 
           class="w-full px-4 py-2 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm transition-colors"
         >
-          <option value="MGA">MGA (Ariary Malgache)</option>
-          <option value="USD">USD (Dollar US)</option>
-          <option value="EUR">EUR (Euro)</option>
+          {#each data.currencies as cur}
+            <option value={cur.code}>{cur.code} ({cur.name})</option>
+          {/each}
         </select>
-      </div>
-
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
-        <div>
-          <label for="usd_rate" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Taux USD (1 $ = ? Ar)</label>
-          <input 
-            id="usd_rate"
-            bind:value={settings.usd_rate} 
-            type="number" 
-            class="w-full px-4 py-2 bg-gray-50 dark:bg-gray-900/50 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm transition-colors"
-          />
-        </div>
-        <div>
-          <label for="eur_rate" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Taux EUR (1 € = ? Ar)</label>
-          <input 
-            id="eur_rate"
-            bind:value={settings.eur_rate} 
-            type="number" 
-            class="w-full px-4 py-2 bg-gray-50 dark:bg-gray-900/50 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm transition-colors"
-          />
-        </div>
       </div>
 
       <div class="pt-2">

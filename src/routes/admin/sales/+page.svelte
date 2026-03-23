@@ -223,7 +223,10 @@
           <tbody style="border-top: 1px dashed #e5e7eb;">
             {#each saleItems as item}
               <tr style="border-bottom: 1px dashed #e5e7eb;">
-                <td style="padding: 4px 0; text-transform: uppercase; font-weight: bold; font-size: 11px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 100px;">{item.product_name}</td>
+                <td style="padding: 4px 0; text-transform: uppercase; font-weight: bold; font-size: 11px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 100px;">
+                  {item.product_name}
+                  {#if item.unit}<br/><span style="font-size: 9px; font-weight: normal; color: #6b7280;">/ {item.unit}</span>{/if}
+                </td>
                 <td style="padding: 4px 0; text-align: center;">{item.quantity}</td>
                 <td style="padding: 4px 0; text-align: right; font-size: 11px;">{formatPrice(item.unit_price, selectedSale)}</td>
                 <td style="padding: 4px 0; text-align: right; font-weight: bold;">{formatPrice(item.subtotal, selectedSale)}</td>

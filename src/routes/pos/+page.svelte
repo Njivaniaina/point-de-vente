@@ -5,7 +5,7 @@
 
   let { data } = $props() as any;
 
-  type Product = { id: number; name: string; price: number; stock: number; category_id: number | null; category_name?: string; category_color?: string; image_url?: string };
+  type Product = { id: number; name: string; price: number; stock: number; unit?: string; category_id: number | null; category_name?: string; category_color?: string; image_url?: string };
   type CartItem = { product: Product; quantity: number };
 
   let products = $state(data.products as Product[]);
@@ -18,6 +18,7 @@
   let cart = $state<CartItem[]>([]);
   let selectedPosId = $state<number | null>(data.posInstances[0]?.id ?? null);
   let selectedClientId = $state<number | null>(null);
+  let selectedCurrencyCode = $state(data.settings.currency || 'MGA');
   let paymentMethod = $state('cash');
   let cardNumber = $state('');
   let note = $state('');
@@ -30,10 +31,12 @@
 
   // Watch for client selection or payment method change to auto-fill card number
   $effect(() => {
-    if (paymentMethod === 'card' && selectedClientId) {
-      const client = clients.find(c => c.id === selectedClientId);
-      if (client?.card_number) {
-        cardNumber = client.card_number;
+    if (paymentMethod === 'card') {
+      if (selectedClientId) {
+        const client = clients.find(c => c.id === selectedClientId);
+        cardNumber = client?.card_number || '';
+      } else {
+        cardNumber = '';
       }
     }
   });
@@ -42,22 +45,20 @@
 
   const paymentLabels: Record<string, string> = { cash: 'Espèces', card: 'Carte' };
 
-  let currencyFormat = $derived(new Intl.NumberFormat('fr-FR', {
-    style: 'currency',
-    currency: data.settings.currency || 'MGA',
-    currencyDisplay: 'symbol'
-  }));
-
   function formatPrice(amount: number) {
-    const currency = data.settings.currency || 'MGA';
-    if (currency === 'MGA') {
+    const currency = data.currencies.find((c: any) => c.code === selectedCurrencyCode) || { code: 'MGA', symbol: 'Ar', exchange_rate: 1 };
+    
+    if (currency.code === 'MGA') {
       return new Intl.NumberFormat('fr-MG').format(amount) + ' Ar';
     }
     
-    const rate = parseFloat(data.settings[currency.toLowerCase() + '_rate'] || '1');
-    const converted = amount / (rate || 1);
+    const converted = amount / (currency.exchange_rate || 1);
     
-    return currencyFormat.format(converted);
+    return new Intl.NumberFormat('fr-FR', {
+      style: 'currency',
+      currency: currency.code,
+      currencyDisplay: 'symbol'
+    }).format(converted);
   }
 
   let filtered = $derived(products.filter(p => {
@@ -109,6 +110,7 @@
     const items = cart.map(i => ({
       product_id: i.product.id,
       quantity: i.quantity,
+      unit: i.product.unit,
       unit_price: i.product.price
     }));
 
@@ -124,8 +126,8 @@
           subtotal: cartSubtotal,
           tax_amount: cartTaxAmount,
           tax_rate: taxRate,
-          currency: data.settings.currency || 'MGA',
-          exchange_rate: parseFloat(data.settings[(data.settings.currency || 'MGA').toLowerCase() + '_rate'] || '1'),
+          currency: selectedCurrencyCode,
+          exchange_rate: data.currencies.find((c: any) => c.code === selectedCurrencyCode)?.exchange_rate || 1,
           note,
           items
         })
@@ -274,6 +276,19 @@
         {/each}
       </select>
 
+      <!-- Currency Switcher -->
+      <div class="flex items-center gap-1 bg-gray-100 dark:bg-gray-800 rounded-lg p-1">
+        {#each data.currencies as cur}
+          <button 
+            onclick={() => selectedCurrencyCode = cur.code}
+            class="px-2 py-1 rounded text-[10px] font-bold transition-all
+              {selectedCurrencyCode === cur.code ? 'bg-blue-600 text-white shadow-sm' : 'text-gray-500 hover:text-gray-400'}"
+          >
+            {cur.symbol}
+          </button>
+        {/each}
+      </div>
+
       <div class="flex-1">
         <div class="relative">
           <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -349,7 +364,7 @@
                 <!-- Stock Badge -->
                 <div class="absolute bottom-1 right-1 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider
                   {product.stock <= 0 ? 'bg-red-500 text-white' : 'bg-gray-800/80 text-gray-300'}">
-                  {product.stock <= 0 ? 'Épuisé' : `Stock: ${product.stock}`}
+                  {product.stock <= 0 ? 'Épuisé' : `Stock: ${product.stock} ${product.unit || ''}`}
                 </div>
               </div>
               <p class="text-gray-900 dark:text-white text-xs font-semibold leading-tight line-clamp-2 mb-1">{product.name}</p>
@@ -414,7 +429,7 @@
           <div class="px-4 py-3 border-b border-gray-100 dark:border-gray-800 flex items-start gap-3">
             <div class="flex-1 min-w-0">
               <p class="text-gray-900 dark:text-white text-sm font-medium leading-tight line-clamp-1">{item.product.name}</p>
-              <p class="text-blue-400 text-xs">{formatPrice(item.product.price)}</p>
+              <p class="text-blue-400 text-xs">{formatPrice(item.product.price)} <span class="text-[9px] opacity-60">/ {item.product.unit || 'un.'}</span></p>
             </div>
             <div class="flex items-center gap-1 shrink-0">
               <button onclick={() => updateQty(item.product.id, -1)} class="w-6 h-6 rounded-md bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-900 dark:text-white text-sm flex items-center justify-center transition-colors">−</button>
@@ -581,7 +596,10 @@
           <tbody style="border-top: 1px dashed #e5e7eb;">
             {#each invoiceData.items as item}
               <tr style="border-bottom: 1px dashed #e5e7eb;">
-                <td style="padding: 4px 0; text-transform: uppercase; font-weight: bold; font-size: 11px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 100px;">{item.product_name}</td>
+                <td style="padding: 4px 0; text-transform: uppercase; font-weight: bold; font-size: 11px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 100px;">
+                  {item.product_name}
+                  {#if item.unit}<br/><span style="font-size: 9px; font-weight: normal; color: #6b7280;">/ {item.unit}</span>{/if}
+                </td>
                 <td style="padding: 4px 0; text-align: center;">{item.quantity}</td>
                 <td style="padding: 4px 0; text-align: right; font-size: 11px;">{formatPrice(item.unit_price)}</td>
                 <td style="padding: 4px 0; text-align: right; font-weight: bold;">{formatPrice(item.subtotal)}</td>

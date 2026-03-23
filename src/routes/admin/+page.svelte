@@ -2,14 +2,13 @@
   let { data } = $props() as any;
 
   function formatPrice(amount: number, saleContext?: any) {
-    const currency = saleContext ? (saleContext.currency || 'MGA') : (data.settings.currency || 'MGA');
+    const curCode = saleContext ? (saleContext.currency || 'MGA') : (data.settings.currency || 'MGA');
+    const currency = data.currencies.find((c: any) => c.code === curCode) || { code: 'MGA', symbol: 'Ar', exchange_rate: 1 };
     
-    // For historical sales, we use the stored rate if available
-    const rate = saleContext 
-      ? parseFloat(saleContext.exchange_rate || '1') 
-      : parseFloat(data.settings[currency.toLowerCase() + '_rate'] || '1');
+    // For historical sales, we use the stored rate. Otherwise use the current rate of the target currency.
+    const rate = saleContext ? parseFloat(saleContext.exchange_rate || '1') : currency.exchange_rate;
 
-    if (currency === 'MGA') {
+    if (currency.code === 'MGA') {
       return new Intl.NumberFormat('fr-MG').format(amount) + ' Ar';
     }
     
@@ -17,7 +16,7 @@
     
     return new Intl.NumberFormat('fr-FR', {
       style: 'currency',
-      currency: currency,
+      currency: currency.code,
       currencyDisplay: 'symbol'
     }).format(converted);
   }

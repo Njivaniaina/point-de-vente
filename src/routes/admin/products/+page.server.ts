@@ -11,5 +11,6 @@ export const load: PageServerLoad = () => {
     ORDER BY p.name
   `).all();
   const categories = db.prepare('SELECT * FROM categories ORDER BY name').all();
-  return { products, categories };
+  const currencies = db.prepare('SELECT * FROM currencies WHERE active = 1').all();
+  return { products, categories, currencies };
 };

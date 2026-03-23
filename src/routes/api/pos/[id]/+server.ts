@@ -5,7 +5,7 @@ import type { RequestHandler } from './$types.js';
 export const PUT: RequestHandler = async ({ request, params }) => {
   const db = getDb();
   const { name, location, active } = await request.json();
-  db.prepare('UPDATE pos_instances SET name=?, location=?, active=? WHERE id=?').run(name, location || null, active ?? 1, params.id);
+  db.prepare('UPDATE pos_instances SET name=?, location=?, active=? WHERE id=?').run(name || null, location || null, active ?? 1, params.id);
   const row = db.prepare('SELECT * FROM pos_instances WHERE id = ?').get(params.id);
   return json(row);
 };

@@ -13,5 +13,7 @@ export const load: LayoutServerLoad = ({ cookies }) => {
   const settingsRows = db.prepare('SELECT * FROM settings').all() as { key: string, value: string }[];
   const settings = settingsRows.reduce((acc, row) => ({ ...acc, [row.key]: row.value }), {});
 
-  return { settings, user };
+  const currencies = db.prepare('SELECT * FROM currencies WHERE active = 1 ORDER BY is_default DESC, code ASC').all();
+
+  return { settings, user, currencies };
 };
