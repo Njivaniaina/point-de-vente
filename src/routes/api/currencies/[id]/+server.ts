@@ -8,6 +8,8 @@ export const PUT: RequestHandler = async ({ request, params }) => {
     try {
         if (is_default) {
             db.prepare('UPDATE currencies SET is_default = 0').run();
+            // Sync with settings
+            db.prepare('INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)').run('currency', code.toUpperCase());
         }
 
         db.prepare(

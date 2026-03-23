@@ -86,7 +86,7 @@
       return new Intl.NumberFormat('fr-MG').format(amount) + ' Ar';
     }
     
-    const converted = amount / (rate || 1);
+    const converted = amount * (rate || 1);
     
     // Create a local formatter for the specific currency if it's historical
     const formatter = saleContext ? new Intl.NumberFormat('fr-FR', {
@@ -129,14 +129,15 @@
     <input bind:value={search} placeholder="Rechercher par ref, client ou caisse..." class="w-full pl-9 pr-4 py-2.5 bg-white dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors" />
   </div>
 
-  <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 shadow-sm overflow-hidden transition-colors duration-300">
+  <!-- Table (Desktop) -->
+  <div class="hidden md:block bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 shadow-sm overflow-hidden transition-colors duration-300">
     <div class="overflow-x-auto">
       <table class="w-full text-sm">
         <thead class="bg-gray-50 dark:bg-gray-900/50 border-b border-gray-100 dark:border-gray-700">
           <tr>
             <th class="px-4 py-3 text-left font-semibold text-gray-600 dark:text-gray-400">Référence</th>
-            <th class="px-4 py-3 text-left font-semibold text-gray-600 dark:text-gray-400 hidden sm:table-cell">Caisse</th>
-            <th class="px-4 py-3 text-left font-semibold text-gray-600 dark:text-gray-400 hidden md:table-cell">Client</th>
+            <th class="px-4 py-3 text-left font-semibold text-gray-600 dark:text-gray-400">Caisse</th>
+            <th class="px-4 py-3 text-left font-semibold text-gray-600 dark:text-gray-400">Client</th>
             <th class="px-4 py-3 text-left font-semibold text-gray-600 dark:text-gray-400 hidden lg:table-cell">Paiement</th>
             <th class="px-4 py-3 text-right font-semibold text-gray-600 dark:text-gray-400">Montant</th>
             <th class="px-4 py-3 text-right font-semibold text-gray-600 dark:text-gray-400">Date</th>
@@ -147,8 +148,8 @@
           {#each filtered as sale}
             <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
               <td class="px-4 py-3 font-mono text-xs text-blue-700 dark:text-blue-400 font-semibold">{sale.invoice_ref}</td>
-              <td class="px-4 py-3 text-gray-600 dark:text-gray-400 hidden sm:table-cell">{sale.pos_name}</td>
-              <td class="px-4 py-3 text-gray-600 dark:text-gray-400 hidden md:table-cell">{sale.client_name ?? 'Anonyme'}</td>
+              <td class="px-4 py-3 text-gray-600 dark:text-gray-400">{sale.pos_name}</td>
+              <td class="px-4 py-3 text-gray-600 dark:text-gray-400">{sale.client_name ?? 'Anonyme'}</td>
               <td class="px-4 py-3 hidden lg:table-cell">
                 <span class="text-xs px-2 py-0.5 bg-gray-100 dark:bg-gray-900 text-gray-600 dark:text-gray-400 rounded-full">{paymentLabels[sale.payment_method] ?? sale.payment_method}</span>
               </td>
@@ -158,12 +159,43 @@
                 <button onclick={() => viewSale(sale.id)} class="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 text-xs font-semibold underline">Voir</button>
               </td>
             </tr>
-          {:else}
-            <tr><td colspan="7" class="px-4 py-12 text-center text-gray-400">Aucune vente</td></tr>
           {/each}
         </tbody>
       </table>
     </div>
+  </div>
+
+  <!-- Cards (Mobile) -->
+  <div class="grid grid-cols-1 gap-4 md:hidden">
+    {#each filtered as sale}
+      <div 
+        role="button"
+        tabindex="0"
+        onclick={() => viewSale(sale.id)}
+        onkeydown={(e) => e.key === 'Enter' && viewSale(sale.id)}
+        class="bg-white dark:bg-gray-800 p-4 rounded-xl border border-gray-100 dark:border-gray-700 shadow-sm space-y-3 cursor-pointer hover:border-blue-300 transition-colors"
+      >
+        <div class="flex justify-between items-start">
+          <div>
+            <div class="text-[10px] text-blue-600 font-bold mb-0.5">{sale.invoice_ref}</div>
+            <h3 class="font-bold text-gray-900 dark:text-white">{sale.client_name ?? 'Anonyme'}</h3>
+            <p class="text-[10px] text-gray-500">{sale.pos_name}</p>
+          </div>
+          <div class="text-right">
+            <div class="font-black text-gray-900 dark:text-white">{formatPrice(sale.total_amount, sale)}</div>
+            <div class="text-[10px] text-gray-500">{new Date(sale.created_at).toLocaleDateString('fr-FR')} {new Date(sale.created_at).toLocaleTimeString('fr-FR', {hour: '2-digit', minute:'2-digit'})}</div>
+          </div>
+        </div>
+        <div class="flex justify-between items-center pt-2 border-t dark:border-gray-700">
+           <span class="text-[10px] px-2 py-0.5 bg-gray-100 dark:bg-gray-900 text-gray-600 dark:text-gray-400 rounded-full">{paymentLabels[sale.payment_method] ?? sale.payment_method}</span>
+           <span class="text-blue-600 dark:text-blue-400 text-[10px] font-bold">Toucher pour voir {'>'}</span>
+        </div>
+      </div>
+    {:else}
+      <div class="bg-white dark:bg-gray-800 p-12 text-center rounded-xl border-2 border-dashed border-gray-100 dark:border-gray-700 text-gray-400">
+        Aucune vente trouvée
+      </div>
+    {/each}
   </div>
 </div>
 

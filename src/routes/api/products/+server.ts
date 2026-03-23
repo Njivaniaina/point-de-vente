@@ -18,6 +18,13 @@ export const POST: RequestHandler = async ({ request }) => {
   const db = getDb();
   const { name, price, stock, unit, barcode, image_url, category_id, original_price, price_currency } = await request.json();
   if (!name) return json({ error: 'Name required' }, { status: 400 });
+
+  // Check for duplicates
+  const existing = db.prepare('SELECT id FROM products WHERE (name = ? OR (barcode IS NOT NULL AND barcode = ?)) AND active = 1').get(name, barcode || null);
+  if (existing) {
+    return json({ error: 'Un produit avec ce nom ou ce code-barres existe déjà.' }, { status: 400 });
+  }
+
   const result = db.prepare(
     'INSERT INTO products (name, price, stock, unit, barcode, image_url, category_id, original_price, price_currency) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)'
   ).run(name, price, stock, unit || 'unité', barcode || null, image_url || null, category_id || null, original_price || price, price_currency || 'MGA');

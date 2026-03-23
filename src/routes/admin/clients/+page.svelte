@@ -58,14 +58,15 @@
     <input bind:value={search} placeholder="Rechercher un client..." class="w-full pl-9 pr-4 py-2.5 bg-white dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors" />
   </div>
 
-  <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 shadow-sm overflow-hidden transition-colors duration-300">
+  <!-- Table (Desktop) -->
+  <div class="hidden md:block bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 shadow-sm overflow-hidden transition-colors duration-300">
     <div class="overflow-x-auto">
       <table class="w-full text-sm">
         <thead class="bg-gray-50 dark:bg-gray-900/50 border-b border-gray-100 dark:border-gray-700">
           <tr>
             <th class="px-4 py-3 text-left font-semibold text-gray-600 dark:text-gray-400">Nom</th>
-            <th class="px-4 py-3 text-left font-semibold text-gray-600 dark:text-gray-400 hidden sm:table-cell">Téléphone</th>
-            <th class="px-4 py-3 text-left font-semibold text-gray-600 dark:text-gray-400 hidden md:table-cell">Email</th>
+            <th class="px-4 py-3 text-left font-semibold text-gray-600 dark:text-gray-400">Téléphone</th>
+            <th class="px-4 py-3 text-left font-semibold text-gray-600 dark:text-gray-400">Email</th>
             <th class="px-4 py-3 text-right font-semibold text-gray-600 dark:text-gray-400">Actions</th>
           </tr>
         </thead>
@@ -74,13 +75,12 @@
             <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
               <td class="px-4 py-3">
                 <div class="font-medium text-gray-900 dark:text-white">{client.name}</div>
-                <div class="text-gray-400 dark:text-gray-500 text-xs md:hidden">{client.phone ?? ''} {client.email ?? ''}</div>
                 {#if client.card_number}
                   <div class="text-[10px] text-blue-500 font-mono mt-0.5">💳 {client.card_number}</div>
                 {/if}
               </td>
-              <td class="px-4 py-3 text-gray-600 dark:text-gray-400 hidden sm:table-cell">{client.phone ?? '—'}</td>
-              <td class="px-4 py-3 text-gray-600 dark:text-gray-400 hidden md:table-cell">{client.email ?? '—'}</td>
+              <td class="px-4 py-3 text-gray-600 dark:text-gray-400">{client.phone ?? '—'}</td>
+              <td class="px-4 py-3 text-gray-600 dark:text-gray-400">{client.email ?? '—'}</td>
               <td class="px-4 py-3 text-right">
                 <div class="flex gap-1 justify-end">
                   <button onclick={() => openEdit(client)} aria-label="Modifier le client" class="p-1.5 rounded-lg text-gray-400 dark:text-gray-500 hover:bg-blue-50 dark:hover:bg-blue-900/30 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
@@ -92,12 +92,53 @@
                 </div>
               </td>
             </tr>
-          {:else}
-            <tr><td colspan="4" class="px-4 py-12 text-center text-gray-400">Aucun client trouvé</td></tr>
           {/each}
         </tbody>
       </table>
     </div>
+  </div>
+
+  <!-- Cards (Mobile) -->
+  <div class="grid grid-cols-1 gap-4 md:hidden">
+    {#each filtered as client}
+      <div class="bg-white dark:bg-gray-800 p-4 rounded-xl border border-gray-100 dark:border-gray-700 shadow-sm space-y-3 transition-colors">
+        <div class="flex justify-between items-start">
+          <div>
+            <h3 class="font-bold text-gray-900 dark:text-white">{client.name}</h3>
+            {#if client.card_number}
+              <div class="text-[10px] text-blue-500 font-mono mt-0.5">💳 {client.card_number}</div>
+            {/if}
+          </div>
+          <div class="flex gap-2">
+            <button onclick={() => openEdit(client)} class="p-2 rounded-lg bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400">
+              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
+            </button>
+            <button onclick={() => deleteClient(client.id)} class="p-2 rounded-lg bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400">
+              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+            </button>
+          </div>
+        </div>
+        
+        <div class="space-y-1.5 pt-2 border-t dark:border-gray-700">
+          {#if client.phone}
+            <div class="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+              <svg class="w-4 h-4 opacity-50" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" /></svg>
+              {client.phone}
+            </div>
+          {/if}
+          {#if client.email}
+            <div class="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+              <svg class="w-4 h-4 opacity-50" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
+              {client.email}
+            </div>
+          {/if}
+        </div>
+      </div>
+    {:else}
+      <div class="bg-white dark:bg-gray-800 p-12 text-center rounded-xl border-2 border-dashed border-gray-100 dark:border-gray-700 text-gray-400">
+        Aucun client trouvé
+      </div>
+    {/each}
   </div>
 </div>
 

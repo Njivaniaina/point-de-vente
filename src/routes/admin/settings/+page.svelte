@@ -141,19 +141,6 @@
         />
       </div>
 
-      <div>
-        <label for="currency" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Devise d'affichage par défaut</label>
-        <select 
-          id="currency"
-          bind:value={settings.currency} 
-          class="w-full px-4 py-2 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm transition-colors"
-        >
-          {#each data.currencies as cur}
-            <option value={cur.code}>{cur.code} ({cur.name})</option>
-          {/each}
-        </select>
-      </div>
-
       <div class="pt-2">
         <label for="tax_rate" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Taux de Taxe (TVA %)</label>
         <input 

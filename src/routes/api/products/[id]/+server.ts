@@ -9,8 +9,14 @@ export const PUT: RequestHandler = async ({ request, params }) => {
   
   // If only 'active' is provided (restoration), we only update that
   if (Object.keys(body).length === 1 && active !== undefined) {
-    db.prepare('UPDATE products SET active = ? WHERE id = ?').run(active, params.id);
+    db.prepare('UPDATE products SET active = ? WHERE id = ?').run(active ? 1 : 0, params.id);
   } else {
+    // Check for duplicates (excluding current product)
+    const existing = db.prepare('SELECT id FROM products WHERE (name = ? OR (barcode IS NOT NULL AND barcode = ?)) AND active = 1 AND id != ?').get(name, barcode || null, params.id);
+    if (existing) {
+      return json({ error: 'Un autre produit avec ce nom ou ce code-barres existe déjà.' }, { status: 400 });
+    }
+
     db.prepare(
       'UPDATE products SET name=?, price=?, stock=?, unit=?, barcode=?, image_url=?, category_id=?, active=?, original_price=?, price_currency=? WHERE id=?'
     ).run(name, price, stock, unit || 'unité', barcode || null, image_url || null, category_id || null, active ?? 1, original_price || price, price_currency || 'MGA', params.id);

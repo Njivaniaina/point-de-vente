@@ -18,6 +18,12 @@ export const POST: RequestHandler = async ({ request }) => {
   const transaction = db.transaction((data) => {
     for (const [key, value] of Object.entries(data)) {
       updateSetting.run(key, value);
+      
+      // If updating the default currency, sync the currencies table
+      if (key === 'currency') {
+          db.prepare('UPDATE currencies SET is_default = 0').run();
+          db.prepare('UPDATE currencies SET is_default = 1 WHERE code = ?').run(value);
+      }
     }
   });
 

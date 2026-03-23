@@ -7,6 +7,8 @@
   let loading = $state(false);
   let error = $state('');
   let search = $state('');
+  let unitFilter = $state('');
+  let categoryFilter = $state('');
   let uploadingImage = $state(false);
   let showGallery = $state(false);
   let galleryImages = $state<{url: string, name: string}[]>([]);
@@ -65,8 +67,10 @@
 
   let filtered = $derived(
     products.filter(p =>
-      p?.name?.toLowerCase().includes(search.toLowerCase()) ||
-      (p?.category_name ?? '').toLowerCase().includes(search.toLowerCase())
+      (p?.name?.toLowerCase().includes(search.toLowerCase()) ||
+       (p?.category_name ?? '').toLowerCase().includes(search.toLowerCase())) &&
+      (unitFilter === '' || p.unit === unitFilter) &&
+      (categoryFilter === '' || p.category_id?.toString() === categoryFilter)
     )
   );
 
@@ -87,13 +91,20 @@
     const url = isEdit ? `/api/products/${editTarget.id}` : '/api/products';
     const method = isEdit ? 'PUT' : 'POST';
     const res = await fetch(url, { method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...editTarget, category_id: editTarget.category_id || null }) });
-    const saved = await res.json();
-    if (isEdit) {
-      products = products.map(p => p.id === saved.id ? saved : p);
+    
+    if (res.ok) {
+      const saved = await res.json();
+      if (isEdit) {
+        products = products.map(p => p.id === saved.id ? saved : p);
+      } else {
+        products = [...products, saved];
+      }
+      showModal = false;
     } else {
-      products = [...products, saved];
+      const errData = await res.json();
+      error = errData.error || "Erreur lors de l'enregistrement";
     }
-    showModal = false; loading = false;
+    loading = false;
   }
 
   async function deleteProduct(id: number) {
@@ -116,7 +127,7 @@
       return new Intl.NumberFormat('fr-MG').format(amount) + ' Ar';
     }
     
-    const converted = amount / (currency.exchange_rate || 1);
+    const converted = amount * (currency.exchange_rate || 1);
     return new Intl.NumberFormat('fr-FR', {
       style: 'currency',
       currency: currency.code,
@@ -155,12 +166,35 @@
     </button>
   </div>
 
-  <!-- Search -->
-  <div class="relative">
-    <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M17 11A6 6 0 105 11a6 6 0 0012 0z" />
-    </svg>
-    <input bind:value={search} placeholder="Rechercher un produit..." class="w-full pl-9 pr-4 py-2.5 bg-white dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors" />
+  <!-- Search & Filter -->
+  <div class="flex flex-col md:flex-row gap-4">
+    <div class="relative flex-1">
+      <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M17 11A6 6 0 105 11a6 6 0 0012 0z" />
+      </svg>
+      <input bind:value={search} placeholder="Rechercher un produit..." class="w-full pl-9 pr-4 py-2.5 bg-white dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors" />
+    </div>
+    <div class="w-full md:w-48 shrink-0">
+      <select bind:value={categoryFilter} class="w-full px-4 py-2.5 bg-white dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors">
+        <option value="">Toutes catégories</option>
+        {#each categories as cat}
+          <option value={cat.id.toString()}>{cat.name}</option>
+        {/each}
+      </select>
+    </div>
+    <div class="w-full md:w-48 shrink-0">
+      <select bind:value={unitFilter} class="w-full px-4 py-2.5 bg-white dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors">
+        <option value="">Toutes unités</option>
+        <option value="unité">Unité</option>
+        <option value="kg">Kilogramme (Kg)</option>
+        <option value="g">Gramme (g)</option>
+        <option value="l">Litre (L)</option>
+        <option value="ml">Millilitre (ml)</option>
+        <option value="paquet">Paquet</option>
+        <option value="boite">Boîte</option>
+        <option value="sac">Sac</option>
+      </select>
+    </div>
   </div>
 
   <!-- Table -->

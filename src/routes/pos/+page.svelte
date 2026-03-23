@@ -52,7 +52,7 @@
       return new Intl.NumberFormat('fr-MG').format(amount) + ' Ar';
     }
     
-    const converted = amount / (currency.exchange_rate || 1);
+    const converted = amount * (currency.exchange_rate || 1);
     
     return new Intl.NumberFormat('fr-FR', {
       style: 'currency',
@@ -71,7 +71,7 @@
   let cartSubtotal = $derived(cart.reduce((sum, item) => sum + item.product.price * item.quantity, 0));
   let cartTaxAmount = $derived(cartSubtotal * (taxRate / 100));
   let cartTotal = $derived(cartSubtotal + cartTaxAmount);
-  let cartCount = $derived(cart.reduce((sum, item) => sum + item.quantity, 0));
+  let cartCount = $derived(cart.reduce((sum, item) => sum + (item.product.unit === 'litre' ? 1 : item.quantity), 0));
 
   function addToCart(product: Product) {
     const existing = cart.find(i => i.product.id === product.id);
@@ -82,13 +82,13 @@
     }
   }
 
-  function updateQty(productId: number, delta: number) {
+  function updateQty(productId: number, delta: number, absoluteValue: number | null = null) {
     cart = cart.map(item => {
       if (item.product.id !== productId) return item;
-      const newQty = item.quantity + delta;
-      if (newQty < 1) return item;
+      const newQty = absoluteValue !== null ? absoluteValue : item.quantity + delta;
+      if (newQty <= 0) return item;
       if (newQty > item.product.stock) return item;
-      return { ...item, quantity: newQty };
+      return { ...item, quantity: parseFloat(newQty.toFixed(3)) };
     });
   }
 
@@ -433,7 +433,17 @@
             </div>
             <div class="flex items-center gap-1 shrink-0">
               <button onclick={() => updateQty(item.product.id, -1)} class="w-6 h-6 rounded-md bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-900 dark:text-white text-sm flex items-center justify-center transition-colors">−</button>
-              <span class="text-gray-900 dark:text-white text-sm font-semibold w-6 text-center">{item.quantity}</span>
+              {#if item.product.unit === 'litre'}
+                <input 
+                  type="number" 
+                  step="0.01" 
+                  value={item.quantity} 
+                  oninput={(e) => updateQty(item.product.id, 0, parseFloat(e.currentTarget.value) || 0)}
+                  class="w-16 h-6 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded text-center text-xs font-bold focus:outline-none focus:ring-1 focus:ring-blue-500"
+                />
+              {:else}
+                <span class="text-gray-900 dark:text-white text-sm font-semibold w-6 text-center">{item.quantity}</span>
+              {/if}
               <button onclick={() => updateQty(item.product.id, +1)} class="w-6 h-6 rounded-md bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-900 dark:text-white text-sm flex items-center justify-center transition-colors">+</button>
               <button onclick={() => removeFromCart(item.product.id)} class="w-6 h-6 rounded-md hover:bg-red-900/50 text-red-500 text-sm flex items-center justify-center ml-1 transition-colors">
                 <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>

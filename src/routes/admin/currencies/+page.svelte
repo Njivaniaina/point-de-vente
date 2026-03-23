@@ -4,10 +4,32 @@
 
   let { data } = $props() as { data: PageData };
   let currencies = $state(data.currencies as any[]);
-  let loading = $state(false);
   let showModal = $state(false);
   let editingCurrency = $state<any>(null);
+  let loading = $state(false);
+  let syncing = $state(false);
+  let error = $state('');
 
+  const defaultCurrency = $derived(currencies.find(c => c.code === data.settings.currency) || { exchange_rate: 1, code: 'MGA' });
+
+  async function syncRates() {
+    syncing = true;
+    error = '';
+    try {
+      const res = await fetch('/api/currencies/sync', { method: 'POST' });
+      const resData = await res.json();
+      if (res.ok) {
+        alert(resData.message);
+        window.location.reload(); // Refresh to get new rates
+      } else {
+        error = resData.error;
+      }
+    } catch (err) {
+      error = "Erreur lors de la synchronisation.";
+    } finally {
+      syncing = false;
+    }
+  }
   // Form state
   let form = $state({
     code: '',
@@ -18,9 +40,9 @@
     active: 1
   });
 
-  function openCreate() {
+  function openNew() {
+    form = { code: '', name: '', symbol: '', exchange_rate: 1.0, is_default: false };
     editingCurrency = null;
-    form = { code: '', name: '', symbol: '', exchange_rate: 1, is_default: false, active: 1 };
     showModal = true;
   }
 
@@ -82,13 +104,27 @@
       <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Gestion des Devises</h1>
       <p class="text-gray-500 dark:text-gray-400 text-sm mt-1">Configurez vos taux de conversion (1 {currencies.find(c => c.is_default)?.code} = X devise)</p>
     </div>
-    <button 
-      onclick={openCreate}
-      class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-bold transition-colors shadow-lg shadow-blue-600/20 flex items-center gap-2"
-    >
-      <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
-      Ajouter une devise
-    </button>
+    <div class="flex gap-2">
+      <button onclick={syncRates} disabled={syncing} class="bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 font-semibold px-4 py-2 rounded-xl flex items-center gap-2 transition-all disabled:opacity-50">
+        <svg class="w-4 h-4 {syncing ? 'animate-spin' : ''}" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
+        {syncing ? 'Mise à jour...' : 'Actualiser les taux'}
+      </button>
+      <button onclick={openNew} class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 rounded-xl flex items-center gap-2 transition-colors">
+        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
+        Nouvelle devise
+      </button>
+    </div>
+  </div>
+
+  <div class="bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-800 rounded-xl p-4 flex items-start gap-3">
+    <svg class="w-5 h-5 text-blue-600 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+    <div>
+      <p class="text-sm text-blue-800 dark:text-blue-300 font-medium">Synchronisation mondiale</p>
+      <p class="text-xs text-blue-600/80 dark:text-blue-400/80 mt-1">
+        L'actualisation récupère les derniers taux en temps réel par rapport à votre devise par défaut **({defaultCurrency.code})**. 
+        <span class="font-bold">Remarque : nécessite une connexion Internet.</span>
+      </p>
+    </div>
   </div>
 
   <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -111,9 +147,9 @@
         <div class="space-y-1 mb-6">
           <p class="text-[10px] text-gray-400 uppercase font-bold tracking-tight">Taux de conversion</p>
           <p class="text-lg font-black text-blue-600 dark:text-blue-400">
-            {cur.exchange_rate} <span class="text-xs font-normal text-gray-400">{cur.code}</span>
+            {((1 / defaultCurrency.exchange_rate) * cur.exchange_rate).toFixed(4)} <span class="text-xs font-normal text-gray-400">{cur.code}</span>
           </p>
-          <p class="text-[10px] text-gray-400 italic">1 {currencies.find(c => c.is_default)?.code || 'BASE'} = {cur.exchange_rate} {cur.code}</p>
+          <p class="text-[10px] text-gray-400 italic">1 {defaultCurrency.code} = {((1 / defaultCurrency.exchange_rate) * cur.exchange_rate).toFixed(4)} {cur.code}</p>
         </div>
 
         <div class="flex justify-end gap-2 border-t border-gray-50 dark:border-gray-700 pt-4">
@@ -153,23 +189,18 @@
           </div>
         </div>
 
-        <div>
-          <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Nom Complet</label>
-          <input bind:value={form.name} class="w-full bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Dollar US" />
-        </div>
-
-        <div>
+        <div class="relative">
           <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Taux de conversion</label>
           <div class="relative">
-            <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs font-bold">1 {currencies.find(c => c.is_default)?.code || '...'} =</span>
+            <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs font-bold">1 {defaultCurrency.code} =</span>
             <input type="number" step="0.0001" bind:value={form.exchange_rate} class="w-full bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg pl-20 pr-12 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none" />
             <span class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs font-bold">{form.code || '...'}</span>
           </div>
         </div>
 
         <div class="flex items-center gap-2 pt-2">
-          <input type="checkbox" id="is_default" bind:checked={form.is_default} class="w-4 h-4 text-blue-600 rounded bg-gray-900 border-gray-700" />
-          <label for="is_default" class="text-xs font-medium text-gray-700 dark:text-gray-300 cursor-pointer">Définir comme devise par défaut (Ariary)</label>
+          <input type="checkbox" id="is_default" bind:checked={form.is_default} class="w-4 h-4 text-blue-600 rounded bg-gray-50 dark:bg-gray-800 border-gray-300 dark:border-gray-700" />
+          <label for="is_default" class="text-xs font-medium text-gray-700 dark:text-gray-300 cursor-pointer">Définir comme devise par défaut ({data.settings.currency || 'MGA'})</label>
         </div>
       </div>
 

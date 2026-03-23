@@ -12,7 +12,7 @@
       return new Intl.NumberFormat('fr-MG').format(amount) + ' Ar';
     }
     
-    const converted = amount / (rate || 1);
+    const converted = amount * (rate || 1);
     
     return new Intl.NumberFormat('fr-FR', {
       style: 'currency',

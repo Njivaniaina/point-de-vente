@@ -17,6 +17,8 @@ export const POST: RequestHandler = async ({ request }) => {
     try {
         if (is_default) {
             db.prepare('UPDATE currencies SET is_default = 0').run();
+            // Sync with settings
+            db.prepare('INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)').run('currency', code.toUpperCase());
         }
 
         const result = db.prepare(
