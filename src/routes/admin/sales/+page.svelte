@@ -75,25 +75,30 @@
   }));
 
   function formatPrice(amount: number, saleContext?: any) {
-    const currency = saleContext ? (saleContext.currency || 'MGA') : (data.settings.currency || 'MGA');
+    const currencyCode = saleContext ? (saleContext.currency || 'MGA') : (data.settings.currency || 'MGA');
     
     // For historical invoices, we use the stored rate if available
-    const rate = saleContext 
-      ? parseFloat(saleContext.exchange_rate || '1') 
-      : parseFloat(data.settings[currency.toLowerCase() + '_rate'] || '1');
+    // Otherwise, find the current rate from the currencies table
+    let rate = 1;
+    if (saleContext && saleContext.exchange_rate) {
+      rate = parseFloat(saleContext.exchange_rate);
+    } else {
+      const cur = data.currencies.find((c: any) => c.code === currencyCode);
+      rate = cur ? (cur.exchange_rate || 1) : 1;
+    }
 
-    if (currency === 'MGA') {
+    if (currencyCode === 'MGA') {
       return new Intl.NumberFormat('fr-MG').format(amount) + ' Ar';
     }
     
-    const converted = amount * (rate || 1);
+    const converted = amount * rate;
     
-    // Create a local formatter for the specific currency if it's historical
-    const formatter = saleContext ? new Intl.NumberFormat('fr-FR', {
+    // Create a local formatter for the specific currency
+    const formatter = new Intl.NumberFormat('fr-FR', {
       style: 'currency',
-      currency: currency,
+      currency: currencyCode,
       currencyDisplay: 'symbol'
-    }) : currencyFormat;
+    });
 
     return formatter.format(converted);
   }
@@ -101,16 +106,30 @@
 
 <style>
   @media print {
-    :global(body) { background: white !important; }
+    /* Critical Reset for Layout Wrappers */
+    :global(html), :global(body), :global(#app), :global(main), :global(.h-screen), :global(.flex-1), :global(.min-w-0) { 
+      height: auto !important; 
+      overflow: visible !important; 
+      min-height: auto !important;
+      display: block !important;
+      position: relative !important;
+    }
+    
+    :global(aside), :global(header), :global(nav), .print\:hidden { display: none !important; }
+    
+    /* Document Flow for Thermal Ticket */
     #thermal-ticket { 
       width: 80mm !important; 
-      margin: 0 !important; 
+      margin: 0 auto !important; 
       padding: 0 !important;
-      position: absolute;
-      top: 0;
-      left: 0;
+      position: relative !important;
     }
-    :global(.fixed) { position: absolute !important; }
+    
+    /* Table Pagination */
+    thead { display: table-header-group !important; }
+    tr { break-inside: avoid !important; }
+    
+    :global(.fixed), :global(.sticky) { position: relative !important; }
   }
 </style>
 
@@ -119,14 +138,76 @@
 </svelte:head>
 
 <div class="space-y-6">
-  <div>
-    <h1 class="text-2xl font-bold text-gray-900">Historique des ventes</h1>
-    <p class="text-gray-500 text-sm mt-1">{filtered.length} vente(s)</p>
+  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <div>
+      <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Historique des ventes</h1>
+      <p class="text-gray-500 dark:text-gray-400 text-sm mt-1">{filtered.length} vente(s)</p>
+    </div>
+    <button 
+      onclick={() => window.print()}
+      class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 rounded-xl flex items-center gap-2 transition-colors print:hidden"
+    >
+      <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" /></svg>
+      Exporter en PDF
+    </button>
   </div>
 
-  <div class="relative">
+  <div class="relative print:hidden">
     <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M17 11A6 6 0 105 11a6 6 0 0012 0z" /></svg>
     <input bind:value={search} placeholder="Rechercher par ref, client ou caisse..." class="w-full pl-9 pr-4 py-2.5 bg-white dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors" />
+  </div>
+
+  <!-- Hidden Print-only Report -->
+  <div class="hidden print:block font-serif text-black bg-white p-8">
+    <div class="flex justify-between items-start mb-8 border-b-2 border-gray-300 pb-4">
+      <div>
+        <h1 class="text-3xl font-black uppercase italic italic">{data.settings.shop_name}</h1>
+        <p class="text-sm">{data.settings.shop_address}</p>
+        <p class="text-sm">Tél: {data.settings.shop_phone}</p>
+      </div>
+      <div class="text-right">
+        <h2 class="text-xl font-bold uppercase underline">Rapport de Ventes</h2>
+        <p class="text-xs">Généré le: {new Date().toLocaleString('fr-FR')}</p>
+      </div>
+    </div>
+    
+    <table class="w-full text-xs text-left border-collapse mb-10">
+      <thead>
+        <tr class="bg-gray-100 border-b-2 border-black font-bold uppercase">
+          <th class="p-2">Date</th>
+          <th class="p-2">Référence</th>
+          <th class="p-2">Caisse</th>
+          <th class="p-2">Client</th>
+          <th class="p-2 text-right">Montant</th>
+        </tr>
+      </thead>
+      <tbody>
+        {#each filtered as sale}
+          <tr class="border-b border-gray-200">
+            <td class="p-2">{new Date(sale.created_at).toLocaleDateString('fr-FR')} {new Date(sale.created_at).toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'})}</td>
+            <td class="p-2 font-mono font-bold">{sale.invoice_ref}</td>
+            <td class="p-2">{sale.pos_name}</td>
+            <td class="p-2">{sale.client_name ?? 'Anonyme'}</td>
+            <td class="p-2 text-right font-bold">{formatPrice(sale.total_amount, sale)}</td>
+          </tr>
+        {/each}
+      </tbody>
+      <tfoot>
+        <tr class="border-t-2 border-black font-bold">
+          <td colspan="4" class="p-2 text-right uppercase">Total Général ({filtered.length} ventes)</td>
+          <td class="p-2 text-right">
+            <div class="text-[10px] text-gray-500 font-normal">Base: {new Intl.NumberFormat('fr-MG').format(filtered.reduce((sum, s) => sum + Number(s.total_amount), 0))} Ar</div>
+            <div class="text-lg underline decoration-double">
+              {formatPrice(filtered.reduce((sum, s) => sum + Number(s.total_amount), 0))}
+            </div>
+          </td>
+        </tr>
+      </tfoot>
+    </table>
+    
+    <div class="mt-20 text-center text-[10px] text-gray-500 italic">
+      <p>Ce document est un rapport officiel de l'historique des ventes de {data.settings.shop_name}.</p>
+    </div>
   </div>
 
   <!-- Table (Desktop) -->

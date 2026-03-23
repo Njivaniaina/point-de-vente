@@ -188,11 +188,12 @@
         <option value="unité">Unité</option>
         <option value="kg">Kilogramme (Kg)</option>
         <option value="g">Gramme (g)</option>
-        <option value="l">Litre (L)</option>
+        <option value="litre">Litre (L)</option>
         <option value="ml">Millilitre (ml)</option>
         <option value="paquet">Paquet</option>
         <option value="boite">Boîte</option>
         <option value="sac">Sac</option>
+        <option value="bidon">Bidon</option>
       </select>
     </div>
   </div>

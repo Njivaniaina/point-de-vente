@@ -33,6 +33,19 @@
     const saved = await res.json();
     posInstances = posInstances.map(p => p.id === saved.id ? saved : p);
   }
+  
+  async function deletePos(id: number) {
+    if (id === 1) {
+      alert("La caisse principale ne peut pas être supprimée.");
+      return;
+    }
+    if (!confirm('Voulez-vous vraiment supprimer cette caisse ? Cette action est irréversible.')) return;
+    
+    const res = await fetch(`/api/pos/${id}`, { method: 'DELETE' });
+    if (res.ok) {
+      posInstances = posInstances.filter(p => p.id !== id);
+    }
+  }
 </script>
 
 <svelte:head>
@@ -76,6 +89,11 @@
           <button onclick={() => toggleActive(pos)} aria-label={pos.active ? 'Désactiver la caisse' : 'Activer la caisse'} class="p-2 rounded-lg text-gray-400 dark:text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors" title="{pos.active ? 'Désactiver' : 'Activer'}">
             <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d={pos.active ? "M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" : "M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"} /></svg>
           </button>
+          {#if pos.id !== 1}
+            <button onclick={() => deletePos(pos.id)} aria-label="Supprimer la caisse" class="p-2 rounded-lg text-gray-400 dark:text-gray-500 hover:bg-red-50 dark:hover:bg-red-900/30 hover:text-red-600 dark:hover:text-red-400 transition-colors" title="Supprimer">
+              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+            </button>
+          {/if}
         </div>
       </div>
     {:else}

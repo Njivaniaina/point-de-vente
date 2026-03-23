@@ -12,6 +12,6 @@ export const PUT: RequestHandler = async ({ request, params }) => {
 
 export const DELETE: RequestHandler = ({ params }) => {
   const db = getDb();
-  db.prepare('UPDATE pos_instances SET active = 0 WHERE id = ?').run(params.id);
+  db.prepare('DELETE FROM pos_instances WHERE id = ?').run(params.id);
   return json({ success: true });
 };

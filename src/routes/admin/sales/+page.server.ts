@@ -13,6 +13,7 @@ export const load: PageServerLoad = () => {
   `).all();
   const settingsRows = db.prepare('SELECT * FROM settings').all() as { key: string, value: string }[];
   const settings = settingsRows.reduce((acc, row) => ({ ...acc, [row.key]: row.value }), {});
+  const currencies = db.prepare('SELECT * FROM currencies').all();
 
-  return { sales, settings };
+  return { sales, settings, currencies };
 };
